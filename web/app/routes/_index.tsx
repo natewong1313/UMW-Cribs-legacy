@@ -13,17 +13,13 @@ export const loader = async ({ request, context }: LoaderArgs) => {
   const headers = new Headers()
   const authRequest = context.auth.handleRequest(request, headers)
   const { user } = await authRequest.validateUser()
-  return json(
-    { isDev: context.is_dev, user, dbUrl: context.env.DATABASE_URL },
-    { headers }
-  )
+  return json({ isDev: context.is_dev, user }, { headers })
 }
 
 export default function Index() {
   const data = useLoaderData<typeof loader>()
   return (
     <div>
-      <p>DB url: {data.dbUrl}</p>
       <h1 className="font-bold text-red-500">Is dev: {"" + data.isDev}</h1>
       <h2 className="font-bold text-blue-500">Signed in: {"" + !!data.user}</h2>
       {data.user && (
