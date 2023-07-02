@@ -12,6 +12,7 @@ export const loader = async ({ request, context }: LoaderArgs) => {
 export default function AuthLayout() {
   return (
     <div>
+      Auth
       <Outlet />
     </div>
   )

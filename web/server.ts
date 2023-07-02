@@ -8,8 +8,12 @@ import * as build from "@remix-run/dev/server-build"
 import __STATIC_CONTENT_MANIFEST from "__STATIC_CONTENT_MANIFEST"
 import { drizzle } from "drizzle-orm/planetscale-serverless"
 import type { TypesafeEnv } from "@/app"
-import { createAuthenticator } from "@/lib/auth.server"
+import {
+  createAuthenticator,
+  createGoogleAuthenticator,
+} from "@/lib/auth.server"
 import { createDbConnection } from "@/lib/db.server"
+import { createSessionStorage } from "@/lib/session.server"
 
 const MANIFEST = JSON.parse(__STATIC_CONTENT_MANIFEST)
 const handleRemixRequest = createRequestHandler(build, process.env.NODE_ENV)
@@ -48,11 +52,18 @@ export default {
     try {
       const dbConnection = createDbConnection(env.DATABASE_URL)
       const isDev = !!build.dev
+      const auth = createAuthenticator(dbConnection, isDev)
       const loadContext: AppLoadContext = {
         env,
         db: drizzle(dbConnection),
-        auth: createAuthenticator(dbConnection, isDev),
+        auth,
+        googleAuth: createGoogleAuthenticator(
+          auth,
+          env.GOOGLE_CLIENT_ID,
+          env.GOOGLE_CLIENT_SECRET
+        ),
         is_dev: isDev,
+        session: createSessionStorage(env.SESSION_SECRET),
       }
       return await handleRemixRequest(request, loadContext)
     } catch (error) {

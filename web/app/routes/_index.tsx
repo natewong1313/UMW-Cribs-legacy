@@ -9,10 +9,11 @@ export const meta: V2_MetaFunction = () => {
   ]
 }
 
-export const loader = ({ context }: LoaderArgs) => {
-  return json({
-    isDev: context.is_dev,
-  })
+export const loader = async ({ request, context }: LoaderArgs) => {
+  const headers = new Headers()
+  const authRequest = context.auth.handleRequest(request, headers)
+  const { user } = await authRequest.validateUser()
+  return json({ isDev: context.is_dev, user }, { headers })
 }
 
 export default function Index() {
@@ -20,6 +21,13 @@ export default function Index() {
   return (
     <div>
       <h1 className="font-bold text-red-500">Is dev: {"" + data.isDev}</h1>
+      <h2 className="font-bold text-blue-500">Signed in: {"" + !!data.user}</h2>
+      {data.user && (
+        <div>
+          <h3 className="font-bold text-green-500">User:</h3>
+          <pre>{JSON.stringify(data.user, null, 2)}</pre>
+        </div>
+      )}
       <ul>
         <li>
           <a
