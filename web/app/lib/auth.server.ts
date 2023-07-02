@@ -29,12 +29,13 @@ export type Authenticator = ReturnType<typeof createAuthenticator>
 export const createGoogleAuthenticator = (
   auth: Authenticator,
   clientId: string,
-  clientSecret: string
+  clientSecret: string,
+  redirectUri: string
 ) => {
   return google(auth, {
     clientId,
     clientSecret,
-    redirectUri: "http://localhost:8787/signin/oauth/google/callback",
+    redirectUri: redirectUri,
     scope: ["profile", "email"],
   })
 }

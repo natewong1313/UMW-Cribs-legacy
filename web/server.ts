@@ -60,7 +60,8 @@ export default {
         googleAuth: createGoogleAuthenticator(
           auth,
           env.GOOGLE_CLIENT_ID,
-          env.GOOGLE_CLIENT_SECRET
+          env.GOOGLE_CLIENT_SECRET,
+          env.GOOGLE_CLIENT_REDIRECTURI
         ),
         is_dev: isDev,
         session: createSessionStorage(env.SESSION_SECRET),
