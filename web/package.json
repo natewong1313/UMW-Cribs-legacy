@@ -7,7 +7,8 @@
     "deploy": "remix build && wrangler deploy",
     "dev": "remix dev --no-restart -c \"npm start\"",
     "start": "wrangler dev ./build/index.js",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "db:push": "drizzle-kit push:mysql --config ./drizzle.config.ts"
   },
   "dependencies": {
     "@conform-to/react": "^0.7.2",
