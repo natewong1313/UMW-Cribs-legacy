@@ -33,6 +33,18 @@ export function handleAuthError(e: unknown): AuthErrorReturn {
         errorMessage: "User does not exist",
         status: 400,
       }
+    case "EXPIRED_TOKEN":
+      return {
+        error: { "": "Token has expired" },
+        errorMessage: "Token has expired",
+        status: 401,
+      }
+    case "INVALID_TOKEN":
+      return {
+        error: { "": "Invalid token" },
+        errorMessage: "Invalid token",
+        status: 401,
+      }
     default:
       return {
         error: { "": errorMessage },

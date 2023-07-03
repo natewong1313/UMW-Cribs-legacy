@@ -1,5 +1,9 @@
 import type { PlanetScaleDatabase } from "drizzle-orm/planetscale-serverless"
-import type { Authenticator, GoogleAuthenticator } from "@/lib/auth.server"
+import type {
+  Authenticator,
+  GoogleAuthenticator,
+  PasswordResetTokenHandler,
+} from "@/lib/auth.server"
 import { OAuthSessionStorage } from "./lib/oauth-session.server"
 import { SessionStorage } from "./lib/session.server"
 
@@ -29,6 +33,7 @@ declare module "@remix-run/cloudflare" {
     env: TypesafeEnv
     db: PlanetScaleDatabase<Record<string, never>>
     auth: Authenticator
+    passwordResetToken: PasswordResetTokenHandler
     googleAuth: GoogleAuthenticator
     is_dev: boolean
     session: SessionStorage

@@ -1,28 +1,14 @@
 import { conform, useForm } from "@conform-to/react"
 import { parse } from "@conform-to/zod"
-import {
-  type ActionArgs,
-  json,
-  redirect,
-  type LoaderArgs,
-} from "@remix-run/cloudflare"
+import { json, type ActionArgs, redirect } from "@remix-run/cloudflare"
 import {
   Form,
-  Link,
   useActionData,
   useLoaderData,
   useNavigation,
 } from "@remix-run/react"
 import { z } from "zod"
 import { handleAuthError } from "@/lib/utils"
-
-export async function loader({ request, context }: LoaderArgs) {
-  const session = await context.session.get(request.headers.get("Cookie"))
-  return json(
-    { message: session.get("message") },
-    { headers: { "Set-Cookie": await context.session.commit(session) } }
-  )
-}
 
 const schema = z.object({
   email: z.string().min(1, "Email is required").email(),
@@ -45,7 +31,8 @@ const schema = z.object({
     )
     .min(8, "The password should be at least 8 characters long"),
 })
-export async function action({ request, context }: ActionArgs) {
+
+export async function action({ request, params, context }: ActionArgs) {
   const formData = await request.formData()
   const submission = parse(formData, { schema })
   const baseResponse = {
@@ -60,20 +47,19 @@ export async function action({ request, context }: ActionArgs) {
     )
   }
   const headers = new Headers()
+  const authRequest = context.auth.handleRequest(request, headers)
+
   try {
-    const user = await context.auth.createUser({
-      primaryKey: {
-        providerId: "email",
-        providerUserId: submission.value.email,
-        password: submission.value.password,
-      },
-      attributes: {
-        email: submission.value.email,
-      },
-    })
-    const authSession = await context.auth.createSession(user.userId)
-    const authRequest = context.auth.handleRequest(request, headers)
-    authRequest.setSession(authSession)
+    const token = await context.passwordResetToken.validate(params.token ?? "")
+    const user = await context.auth.getUser(token.userId)
+    await context.auth.invalidateAllUserSessions(user.userId)
+    await context.auth.updateKeyPassword(
+      "email",
+      user.email,
+      submission.value.password
+    )
+    const session = await context.auth.createSession(user.userId)
+    authRequest.setSession(session)
     return redirect("/", { headers })
   } catch (e) {
     const { error, status } = handleAuthError(e)
@@ -81,9 +67,8 @@ export async function action({ request, context }: ActionArgs) {
   }
 }
 
-export default function SignupPage() {
+export default function ChangePasswordPage() {
   const navigation = useNavigation()
-  const { message } = useLoaderData<typeof loader>()
   const lastSubmission = useActionData<typeof action>()
   const [form, { email, password }] = useForm<z.input<typeof schema>>({
     lastSubmission,
@@ -91,10 +76,7 @@ export default function SignupPage() {
   })
   return (
     <div>
-      SignupPage
-      <div className="text-red-500">
-        {message && handleAuthError(message).errorMessage}
-      </div>
+      Change your password
       <Form method="post" className="flex flex-col p-2" {...form.props}>
         <label>
           Email
@@ -119,18 +101,10 @@ export default function SignupPage() {
           className="w-fit bg-black text-white"
           disabled={navigation.state === "submitting"}
         >
-          Sign up
+          Change password
         </button>
+        <div className="text-red-500">{form.error}</div>
       </Form>
-      <div className="flex flex-col">
-        <Link
-          to="/signin/oauth/google?referer=/signup"
-          className="w-fit ring-1 ring-gray-500"
-        >
-          Continue with google
-        </Link>
-        <Link to="/signin">Sign in instead</Link>
-      </div>
     </div>
   )
 }

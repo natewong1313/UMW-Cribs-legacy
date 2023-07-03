@@ -34,6 +34,7 @@ export async function action({ request, context }: ActionArgs) {
   const baseResponse = {
     ...submission,
     payload: { email: submission.payload.email },
+    value: { email: submission.payload.email },
   }
   if (!submission.value || submission.intent !== "submit") {
     return json(
@@ -92,6 +93,7 @@ export default function SigninPage() {
           />
           {password.error && <div>{password.error}</div>}
         </label>
+        <Link to="/password-reset">Forgot password</Link>
         <button
           type="submit"
           disabled={navigation.state === "submitting"}
