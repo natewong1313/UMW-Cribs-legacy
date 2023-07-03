@@ -12,6 +12,12 @@ export default {
   server: "./server.ts",
   serverConditions: ["worker"],
   serverDependenciesToBundle: [
+    "lucia",
+    "lucia-auth/middleware",
+    "@lucia-auth/adapter-prisma",
+    "lucia-auth/polyfill/node",
+    "@lucia-auth/oauth",
+    "@lucia-auth/oauth/providers",
     // bundle verything except the virtual module for the static content manifest provided by wrangler
     /^(?!.*\b__STATIC_CONTENT_MANIFEST\b).*$/,
   ],

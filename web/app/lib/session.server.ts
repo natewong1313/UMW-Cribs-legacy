@@ -1,9 +1,10 @@
-import { createCookieSessionStorage, createCookie } from "@remix-run/cloudflare"
+import { createCookieSessionStorage } from "@remix-run/cloudflare"
 
 type SessionData = {}
 
 type SessionFlashData = {
   message: string
+  isErrorMessage: boolean
 }
 
 export const createSessionStorage = (sessionSecret: string) => {
@@ -26,10 +27,3 @@ export const createSessionStorage = (sessionSecret: string) => {
   }
 }
 export type SessionStorage = ReturnType<typeof createSessionStorage>
-
-export const oauthStateCookie = createCookie("oauth_state", {
-  path: "/",
-  maxAge: 60 * 60,
-  httpOnly: true,
-  secure: true,
-})

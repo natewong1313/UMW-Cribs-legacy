@@ -1,15 +1,20 @@
 import { conform, useForm } from "@conform-to/react"
 import { parse } from "@conform-to/zod"
-import { type ActionArgs, json, type LoaderArgs } from "@remix-run/cloudflare"
+import {
+  type ActionArgs,
+  json,
+  type LoaderArgs,
+  redirect,
+} from "@remix-run/cloudflare"
 import {
   Form,
+  Link,
   useActionData,
   useLoaderData,
-  useNavigate,
   useNavigation,
 } from "@remix-run/react"
-import { useEffect } from "react"
 import { z } from "zod"
+import { handleAuthError } from "@/lib/utils"
 
 export async function loader({ request, context }: LoaderArgs) {
   const session = await context.session.get(request.headers.get("Cookie"))
@@ -26,37 +31,48 @@ const schema = z.object({
 export async function action({ request, context }: ActionArgs) {
   const formData = await request.formData()
   const submission = parse(formData, { schema })
+  const baseResponse = {
+    ...submission,
+    payload: { email: submission.payload.email },
+  }
   if (!submission.value || submission.intent !== "submit") {
     return json(
       { ...submission, payload: { email: submission.payload.email } },
       { status: 400 }
     )
   }
-  const session = await context.session.get(request.headers.get("Cookie"))
-  session.flash("message", "Signed in successfully")
-  return json(submission, {
-    headers: { "Set-Cookie": await context.session.commit(session) },
-  })
+
+  const headers = new Headers()
+  try {
+    const key = await context.auth.useKey(
+      "email",
+      submission.value.email,
+      submission.value.password
+    )
+    const authSession = await context.auth.createSession(key.userId)
+    const authRequest = context.auth.handleRequest(request, headers)
+    authRequest.setSession(authSession)
+    return redirect("/", { headers })
+  } catch (e) {
+    const { error, status } = handleAuthError(e)
+    return json({ ...baseResponse, error }, { status })
+  }
 }
 
 export default function SigninPage() {
   const navigation = useNavigation()
-  const navigate = useNavigate()
   const { message } = useLoaderData<typeof loader>()
   const lastSubmission = useActionData<typeof action>()
   const [form, { email, password }] = useForm<z.input<typeof schema>>({
     lastSubmission,
     onValidate: ({ formData }) => parse(formData, { schema }),
   })
-  const signinSuccess = message === "Signed in successfully"
-  useEffect(() => {
-    if (signinSuccess) {
-      navigate("/")
-    }
-  }, [signinSuccess, navigate])
   return (
     <div>
       Signin to UMW-Cribs
+      <div className="text-red-500">
+        {message && handleAuthError(message).errorMessage}
+      </div>
       <Form method="post" className="flex flex-col p-2" {...form.props}>
         <label>
           Email
@@ -81,9 +97,18 @@ export default function SigninPage() {
           disabled={navigation.state === "submitting"}
           className="w-fit bg-black text-white"
         >
-          {signinSuccess ? "Successfully signed in" : "Sign in"}
+          Sign in
         </button>
       </Form>
+      <div className="flex flex-col">
+        <Link
+          to="/signin/oauth/google?referer=/signin"
+          className="w-fit ring-1 ring-gray-500"
+        >
+          Continue with google
+        </Link>
+        <Link to="/signup">Sign up instead</Link>
+      </div>
     </div>
   )
 }

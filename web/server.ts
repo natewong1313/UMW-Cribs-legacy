@@ -13,6 +13,7 @@ import {
   createGoogleAuthenticator,
 } from "@/lib/auth.server"
 import { createDbConnection } from "@/lib/db.server"
+import { createOauthSessionStorage } from "@/lib/oauth-session.server"
 import { createSessionStorage } from "@/lib/session.server"
 
 const MANIFEST = JSON.parse(__STATIC_CONTENT_MANIFEST)
@@ -65,6 +66,7 @@ export default {
         ),
         is_dev: isDev,
         session: createSessionStorage(env.SESSION_SECRET),
+        oauthSession: createOauthSessionStorage(env.SESSION_SECRET),
       }
       return await handleRemixRequest(request, loadContext)
     } catch (error) {
