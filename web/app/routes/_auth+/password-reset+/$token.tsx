@@ -1,14 +1,9 @@
 import { conform, useForm } from "@conform-to/react"
 import { parse } from "@conform-to/zod"
 import { json, type ActionArgs, redirect } from "@remix-run/cloudflare"
-import {
-  Form,
-  useActionData,
-  useLoaderData,
-  useNavigation,
-} from "@remix-run/react"
+import { Form, useActionData, useNavigation } from "@remix-run/react"
 import { z } from "zod"
-import { handleAuthError } from "@/lib/utils"
+import { handleAuthError, stripPasswordFromSubmission } from "@/lib/utils"
 
 const schema = z.object({
   email: z.string().min(1, "Email is required").email(),
@@ -31,20 +26,11 @@ const schema = z.object({
     )
     .min(8, "The password should be at least 8 characters long"),
 })
-
 export async function action({ request, params, context }: ActionArgs) {
-  const formData = await request.formData()
-  const submission = parse(formData, { schema })
-  const baseResponse = {
-    ...submission,
-    payload: { email: submission.payload.email },
-    value: { email: submission.payload.email },
-  }
+  const submission = parse(await request.formData(), { schema })
+  const baseResponse = stripPasswordFromSubmission(submission)
   if (!submission.value || submission.intent !== "submit") {
-    return json(
-      { ...submission, payload: { email: submission.payload.email } },
-      { status: 400 }
-    )
+    return json(baseResponse, { status: 400 })
   }
   const headers = new Headers()
   const authRequest = context.auth.handleRequest(request, headers)

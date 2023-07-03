@@ -14,7 +14,7 @@ import {
   useNavigation,
 } from "@remix-run/react"
 import { z } from "zod"
-import { handleAuthError } from "@/lib/utils"
+import { handleAuthError, stripPasswordFromSubmission } from "@/lib/utils"
 
 export async function loader({ request, context }: LoaderArgs) {
   const session = await context.session.get(request.headers.get("Cookie"))
@@ -29,18 +29,10 @@ const schema = z.object({
   password: z.string().min(1, "Password is required"),
 })
 export async function action({ request, context }: ActionArgs) {
-  const formData = await request.formData()
-  const submission = parse(formData, { schema })
-  const baseResponse = {
-    ...submission,
-    payload: { email: submission.payload.email },
-    value: { email: submission.payload.email },
-  }
+  const submission = parse(await request.formData(), { schema })
+  const baseResponse = stripPasswordFromSubmission(submission)
   if (!submission.value || submission.intent !== "submit") {
-    return json(
-      { ...submission, payload: { email: submission.payload.email } },
-      { status: 400 }
-    )
+    return json(baseResponse, { status: 400 })
   }
 
   const headers = new Headers()
@@ -93,7 +85,7 @@ export default function SigninPage() {
           />
           {password.error && <div>{password.error}</div>}
         </label>
-        <Link to="/password-reset">Forgot password</Link>
+        <Link to="/password-reset">Forgot password?</Link>
         <button
           type="submit"
           disabled={navigation.state === "submitting"}
@@ -101,6 +93,7 @@ export default function SigninPage() {
         >
           Sign in
         </button>
+        <div className="text-red-500">{form.error}</div>
       </Form>
       <div className="flex flex-col">
         <Link

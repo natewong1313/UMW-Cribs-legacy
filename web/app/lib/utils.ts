@@ -1,3 +1,4 @@
+import { Submission } from "@conform-to/react"
 import { LuciaError } from "lucia-auth"
 
 type AuthErrorReturn = {
@@ -51,5 +52,13 @@ export function handleAuthError(e: unknown): AuthErrorReturn {
         errorMessage: errorMessage,
         status: 500,
       }
+  }
+}
+
+export function stripPasswordFromSubmission(submission: Submission) {
+  return {
+    ...submission,
+    payload: { email: submission.payload.email },
+    value: { email: submission.payload.email },
   }
 }

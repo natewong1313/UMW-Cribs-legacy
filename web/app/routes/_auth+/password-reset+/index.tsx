@@ -10,8 +10,7 @@ const schema = z.object({
   email: z.string().min(1, "Email is required").email(),
 })
 export async function action({ request, context }: ActionArgs) {
-  const formData = await request.formData()
-  const submission = parse(formData, { schema })
+  const submission = parse(await request.formData(), { schema })
   if (!submission.value || submission.intent !== "submit") {
     return json(submission, { status: 400 })
   }
@@ -58,6 +57,7 @@ export default function PasswordResetPage() {
         >
           Reset Password
         </button>
+        <div className="text-red-500">{form.error}</div>
       </Form>
     </div>
   )

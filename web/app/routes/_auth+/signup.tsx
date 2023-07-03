@@ -14,7 +14,7 @@ import {
   useNavigation,
 } from "@remix-run/react"
 import { z } from "zod"
-import { handleAuthError } from "@/lib/utils"
+import { handleAuthError, stripPasswordFromSubmission } from "@/lib/utils"
 
 export async function loader({ request, context }: LoaderArgs) {
   const session = await context.session.get(request.headers.get("Cookie"))
@@ -46,18 +46,10 @@ const schema = z.object({
     .min(8, "The password should be at least 8 characters long"),
 })
 export async function action({ request, context }: ActionArgs) {
-  const formData = await request.formData()
-  const submission = parse(formData, { schema })
-  const baseResponse = {
-    ...submission,
-    payload: { email: submission.payload.email },
-    value: { email: submission.payload.email },
-  }
+  const submission = parse(await request.formData(), { schema })
+  const baseResponse = stripPasswordFromSubmission(submission)
   if (!submission.value || submission.intent !== "submit") {
-    return json(
-      { ...submission, payload: { email: submission.payload.email } },
-      { status: 400 }
-    )
+    return json(baseResponse, { status: 400 })
   }
   const headers = new Headers()
   try {
@@ -121,6 +113,7 @@ export default function SignupPage() {
         >
           Sign up
         </button>
+        <div className="text-red-500">{form.error}</div>
       </Form>
       <div className="flex flex-col">
         <Link
