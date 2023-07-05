@@ -24,10 +24,6 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-        working-directory: ./email-api
-      - name: Build
-        run: npm run build
-        working-directory: ./email-api
       - name: Deploy
         uses: cloudflare/wrangler-action@2.0.0
         with:
