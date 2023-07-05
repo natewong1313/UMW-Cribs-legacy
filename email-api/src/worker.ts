@@ -23,7 +23,7 @@ router.post("/reset-password", async ({ req, res }) => {
     return
   }
   const template = resetPasswordTemplate(req.body.url)
-  const emailRequest = buildEmailRequest(template)
+  const emailRequest = buildEmailRequest("Reset Your Password", template)
   const emailResponse = await fetch(emailRequest)
   res.status = emailResponse.status
   res.body = await emailResponse.text()
@@ -35,7 +35,7 @@ export default {
   },
 }
 
-const buildEmailRequest = (template: string) =>
+const buildEmailRequest = (subject: string, template: string) =>
   new Request("https://api.mailchannels.net/tx/v1/send", {
     method: "POST",
     headers: {
@@ -46,10 +46,10 @@ const buildEmailRequest = (template: string) =>
         { to: [{ email: "natewong1@gmail.com", name: "Test Recipient" }] },
       ],
       from: {
-        email: "test@umwcribs.com",
-        name: "Test Sender",
+        email: "admin@umwcribs.com",
+        name: "UMW Cribs",
       },
-      subject: "Test Subject",
+      subject: subject,
       content: [
         {
           type: "text/html",
