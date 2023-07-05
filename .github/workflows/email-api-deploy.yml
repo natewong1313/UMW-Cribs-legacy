@@ -1,0 +1,38 @@
+name: Deploy the email api
+
+on:
+  push:
+    branches:
+      - master
+
+defaults:
+  run:
+    working-directory: ./email-api
+
+jobs:
+  deploy:
+    name: Deploy to Cloudflare Workers
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo code
+        uses: actions/checkout@v2
+
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./email-api
+      - name: Build
+        run: npm run build
+        working-directory: ./email-api
+      - name: Deploy
+        uses: cloudflare/wrangler-action@2.0.0
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          workingDirectory: ./email-api
+          secrets: EMAIL_API_KEY
+        env:
+          EMAIL_API_KEY: ${{ secrets.EMAIL_API_KEY }}
