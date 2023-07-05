@@ -1,30 +1,41 @@
+import { Router } from "@tsndr/cloudflare-worker-router"
+import resetPasswordTemplate from "./email-templates/reset-password"
+
 export interface Env {
   EMAIL_API_KEY: string
 }
 
+const router = new Router<Env>()
+router.cors()
+
+router.use(({ env, req, res, next }) => {
+  if (req.headers.get("x-api-key") !== env.EMAIL_API_KEY) {
+    res.status = 401
+    return
+  }
+  next()
+})
+
+router.post("/reset-password", async ({ req, res }) => {
+  if (!req.body.url || req.body.url === "") {
+    res.status = 400
+    res.body = { error: "url is required" }
+    return
+  }
+  const template = resetPasswordTemplate(req.body.url)
+  const emailRequest = buildEmailRequest(template)
+  const emailResponse = await fetch(emailRequest)
+  res.status = emailResponse.status
+  res.body = await emailResponse.text()
+})
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-    if (request.headers.get("x-api-key") !== env.EMAIL_API_KEY) {
-      return new Response(null, {
-        headers: { "content-type": "application/json" },
-        status: 401,
-      })
-    }
-    const emailRequest = buildEmailRequest()
-    const emailResponse = await fetch(emailRequest)
-    return new Response(
-      JSON.stringify({
-        success: emailResponse.status === 200,
-        response: await emailResponse.text(),
-      }),
-      {
-        headers: { "content-type": "application/json" },
-      }
-    )
+    return router.handle(env, request)
   },
 }
 
-const buildEmailRequest = () =>
+const buildEmailRequest = (template: string) =>
   new Request("https://api.mailchannels.net/tx/v1/send", {
     method: "POST",
     headers: {
@@ -41,8 +52,8 @@ const buildEmailRequest = () =>
       subject: "Test Subject",
       content: [
         {
-          type: "text/plain",
-          value: "Test message content\n",
+          type: "text/html",
+          value: template,
         },
       ],
     }),

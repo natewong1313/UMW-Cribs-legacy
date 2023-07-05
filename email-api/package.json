@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "deploy": "wrangler publish",
-    "start": "wrangler dev"
+    "start": "wrangler dev",
+    "email:dev": "email dev --dir src/emails",
+    "email:export": "email export --dir src/emails"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20230419.0",
@@ -15,5 +17,8 @@
     "prettier": "^2.8.8",
     "typescript": "^5.0.4",
     "wrangler": "^3.0.0"
+  },
+  "dependencies": {
+    "@tsndr/cloudflare-worker-router": "^2.3.3"
   }
 }
