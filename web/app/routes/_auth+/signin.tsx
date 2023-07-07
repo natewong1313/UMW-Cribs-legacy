@@ -16,6 +16,7 @@ import {
 import { z } from "zod"
 import { handleAuthError, stripPasswordFromSubmission } from "@/lib/utils"
 
+// this is for returning a message from oauth
 export async function loader({ request, context }: LoaderArgs) {
   const session = await context.session.get(request.headers.get("Cookie"))
   return json(
@@ -85,7 +86,7 @@ export default function SigninPage() {
           />
           {password.error && <div>{password.error}</div>}
         </label>
-        <Link to="/password-reset">Forgot password?</Link>
+        <Link to="/reset-password">Forgot password?</Link>
         <button
           type="submit"
           disabled={navigation.state === "submitting"}

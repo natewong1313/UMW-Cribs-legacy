@@ -26,6 +26,8 @@ export type TypesafeEnv = {
   GOOGLE_CLIENT_ID: string
   GOOGLE_CLIENT_SECRET: string
   GOOGLE_CLIENT_REDIRECTURI: string
+  BASE_URL: string
+  EMAIL_API_KEY: string
 }
 
 declare module "@remix-run/cloudflare" {
