@@ -3,8 +3,9 @@ export const sendPasswordResetLinkEmail = async (
   recepientEmail: string,
   resetLink: string,
   apiKey: string
-) =>
-  await fetch(API_URL, {
+) => {
+  console.log(API_URL, recepientEmail, resetLink, apiKey)
+  const resp = await fetch(API_URL, {
     method: "POST",
     headers: {
       "x-api-key": apiKey,
@@ -15,3 +16,5 @@ export const sendPasswordResetLinkEmail = async (
       url: resetLink,
     }),
   })
+  console.log(resp.status, await resp.text())
+}
