@@ -7,13 +7,7 @@ export const sendPasswordResetLinkEmail = async (
   env: TypesafeEnv
 ) => {
   const resetLink = `${env.BASE_URL}/reset-password?token=${resetToken}`
-  console.log(env.EMAIL_API_SERVICE)
-  let fetcher = env.EMAIL_API_SERVICE.fetch
-  // if (env.IS_DEV) {
-  //   fetcher = fetch
-  // }
-
-  const resp = await env.EMAIL_API_SERVICE.fetch(API_URL, {
+  const options = {
     method: "POST",
     headers: {
       "x-api-key": env.EMAIL_API_KEY,
@@ -23,6 +17,9 @@ export const sendPasswordResetLinkEmail = async (
       recepientEmail,
       url: resetLink,
     }),
-  })
-  console.log(resp.status, await resp.text())
+  }
+  if (env.IS_DEV) {
+    return await fetch(API_URL, options)
+  }
+  return await env.EMAIL_API_SERVICE.fetch(API_URL, options)
 }
