@@ -39,9 +39,13 @@ jobs:
             GOOGLE_CLIENT_ID
             GOOGLE_CLIENT_SECRET
             GOOGLE_CLIENT_REDIRECTURI
+            BASE_URL
+            EMAIL_API_KEY
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
           GOOGLE_CLIENT_REDIRECTURI: ${{ secrets.GOOGLE_CLIENT_REDIRECTURI }}
+          BASE_URL: ${{ secrets.BASE_URL }}
+          EMAIL_API_KEY: ${{ secrets.EMAIL_API_KEY }}
