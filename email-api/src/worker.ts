@@ -3,38 +3,10 @@ import resetPasswordTemplate from "./email-templates/reset-password"
 
 export interface Env {
   EMAIL_API_KEY: string
+  DKIM_DOMAIN: string
+  DKIM_SELECTOR: string
+  DKIM_PRIVATE_KEY: string
 }
-
-// const router = new Router<Env>()
-// router.cors()
-
-// router.use(({ env, req, res, next }) => {
-//   if (req.headers.get("x-api-key") !== env.EMAIL_API_KEY) {
-//     res.status = 401
-//     return
-//   }
-//   next()
-// })
-
-// router.post("/reset-password", async ({ req, res }) => {
-//   if (!req.body.url || req.body.url === "") {
-//     res.status = 400
-//     res.body = { error: "url is required" }
-//     return
-//   }
-//   const template = resetPasswordTemplate(req.body.url)
-//   const emailRequest = buildEmailRequest("Reset Your Password", template)
-//   const emailResponse = await fetch(emailRequest)
-//   console.log(emailResponse)
-//   res.status = emailResponse.status
-//   res.body = await emailResponse.text()
-// })
-
-// export default {
-//   async fetch(request: Request, env: Env): Promise<Response> {
-//     return router.handle(env, request)
-//   },
-// }
 
 type RequestBody = {
   type: string
@@ -71,6 +43,7 @@ export default {
           })
         }
         emailRequest = buildEmailRequest(
+          env,
           "Reset Your Password",
           body.recepientEmail,
           resetPasswordTemplate(body.url)
@@ -87,6 +60,7 @@ export default {
 }
 
 const buildEmailRequest = (
+  env: Env,
   subject: string,
   recepientEmail: string,
   template: string
@@ -98,7 +72,12 @@ const buildEmailRequest = (
     },
     body: JSON.stringify({
       personalizations: [
-        { to: [{ email: recepientEmail, name: "Recipient" }] },
+        {
+          to: [{ email: recepientEmail, name: "Recipient" }],
+          dkim_domain: env.DKIM_DOMAIN,
+          dkim_selector: env.DKIM_SELECTOR,
+          dkim_private_key: env.DKIM_PRIVATE_KEY,
+        },
       ],
       from: {
         email: "admin@umwcribs.com",

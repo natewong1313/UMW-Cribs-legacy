@@ -29,6 +29,13 @@ jobs:
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           workingDirectory: ./email-api
-          secrets: EMAIL_API_KEY
+          secrets: |
+            EMAIL_API_KEY
+            DKIM_DOMAIN
+            DKIM_SELECTOR
+            DKIM_PRIVATE_KEY
         env:
           EMAIL_API_KEY: ${{ secrets.EMAIL_API_KEY }}
+          DKIM_DOMAIN: ${{ secrets.DKIM_DOMAIN }}
+          DKIM_SELECTOR: ${{ secrets.DKIM_SELECTOR }}
+          DKIM_PRIVATE_KEY: ${{ secrets.DKIM_PRIVATE_KEY }}
