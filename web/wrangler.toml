@@ -5,5 +5,9 @@ main = "./build/index.js"
 # https://developers.cloudflare.com/workers/platform/compatibility-dates
 compatibility_date = "2023-04-20"
 
+services = [
+  { binding = "EMAIL_API_SERVICE", service = "email-api" }
+]
+
 [site]
   bucket = "./public"

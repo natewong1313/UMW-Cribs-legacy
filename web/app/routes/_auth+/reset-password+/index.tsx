@@ -42,8 +42,8 @@ export async function action({ request, context }: ActionArgs) {
   const resetToken = await context.passwordResetToken.issue(user.userId)
   await sendPasswordResetLinkEmail(
     user.email,
-    `${context.env.BASE_URL}/reset-password/${resetToken}`,
-    context.env.EMAIL_API_KEY
+    resetToken.toString(),
+    context.env
   )
   const session = await context.session.get(request.headers.get("Cookie"))
   session.flash(

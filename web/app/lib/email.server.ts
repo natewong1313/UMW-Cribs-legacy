@@ -1,14 +1,21 @@
+import { TypesafeEnv } from "@/app"
+
 const API_URL = "https://email-api.natewong.workers.dev/"
 export const sendPasswordResetLinkEmail = async (
   recepientEmail: string,
-  resetLink: string,
-  apiKey: string
+  resetToken: string,
+  env: TypesafeEnv
 ) => {
-  console.log(API_URL, recepientEmail, resetLink, apiKey)
-  const resp = await fetch(API_URL, {
+  const resetLink = `${env.BASE_URL}/reset-password?token=${resetToken}`
+  let fetcher = env.EMAIL_API_SERVICE.fetch
+  if (env.IS_DEV) {
+    fetcher = fetch
+  }
+
+  const resp = await fetcher(API_URL, {
     method: "POST",
     headers: {
-      "x-api-key": apiKey,
+      "x-api-key": env.EMAIL_API_KEY,
     },
     body: JSON.stringify({
       type: "reset-password",

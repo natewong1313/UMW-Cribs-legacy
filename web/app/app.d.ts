@@ -20,6 +20,7 @@ declare namespace Lucia {
 
 export type TypesafeEnv = {
   __STATIC_CONTENT: Fetcher
+  EMAIL_API_SERVICE: Fetcher
   IS_DEV: boolean
   DATABASE_URL: string
   SESSION_SECRET: string
