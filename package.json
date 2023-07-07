@@ -15,5 +15,18 @@
   "bugs": {
     "url": "https://github.com/natewong1313/UMW-Cribs/issues"
   },
-  "homepage": "https://github.com/natewong1313/UMW-Cribs#readme"
+  "homepage": "https://github.com/natewong1313/UMW-Cribs#readme",
+  "workspaces": [
+    "email-api",
+    "web"
+  ],
+  "devDependencies": {
+    "@trivago/prettier-plugin-sort-imports": "^4.1.1",
+    "@typescript-eslint/eslint-plugin": "^5.61.0",
+    "@typescript-eslint/parser": "^5.61.0",
+    "eslint": "^8.44.0",
+    "eslint-config-prettier": "^8.8.0",
+    "prettier": "^2.8.8",
+    "prettier-plugin-tailwindcss": "^0.3.0"
+  }
 }

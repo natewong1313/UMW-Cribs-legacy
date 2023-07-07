@@ -1,4 +1,3 @@
-import { Router } from "@tsndr/cloudflare-worker-router"
 import resetPasswordTemplate from "./email-templates/reset-password"
 
 export interface Env {
