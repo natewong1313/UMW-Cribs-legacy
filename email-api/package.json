@@ -4,9 +4,8 @@
   "private": true,
   "scripts": {
     "deploy": "wrangler publish",
-    "start": "wrangler dev",
-    "email:dev": "email dev --dir src/emails",
-    "email:export": "email export --dir src/emails"
+    "dev": "wrangler dev",
+    "start": "wrangler dev"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20230419.0",
