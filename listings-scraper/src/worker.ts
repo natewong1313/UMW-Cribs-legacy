@@ -12,6 +12,7 @@
  * Learn more at https://developers.cloudflare.com/workers/
  */
 import { ApartmentsDotComScraper } from "./sites/apartments-dot-com"
+import { ZillowScraper } from "./sites/zillow"
 
 export interface Env {
   // Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
@@ -52,7 +53,8 @@ export default {
     // // You could store this result in KV, write to a D1 Database, or publish to a Queue.
     // // In this template, we'll just log the result:
     // console.info(`trigger fired at ${event.cron}: ${wasSuccessful}`)
-    const scraper = new ApartmentsDotComScraper()
-    await scraper.start()
+    const zillowScraper = new ZillowScraper()
+    const apartmentsDotComScraper = new ApartmentsDotComScraper()
+    const zillowListings = await zillowScraper.start()
   },
 }

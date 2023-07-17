@@ -1,34 +1,7 @@
 import { safeJsonParse } from "../utils"
 
-type Listing = {
-  id: string
-  price: number
-  bedrooms: number
-  bathrooms: number
-  sqft: number | null
-  address: {
-    lineOne: string
-    lineTwo: string | null
-    city: string
-    state: string
-    zip: number
-  }
-  latitude: number
-  longitude: number
-  availabilityDate: Date
-  lastUpdatedAt: Date
-  listingUrl: string
-  description: string | null
-  contactInfo: {
-    email: string | null
-    phone: string | null
-  }
-  imageUrls: string[]
-  mainImage: string | null
-}
-
 export class ApartmentsDotComScraper {
-  public listings: { [addressIdentifier: string]: Listing } = {}
+  private listings: { [listingId: string]: Listing } = {}
   constructor() {}
 
   async start() {
@@ -39,6 +12,8 @@ export class ApartmentsDotComScraper {
       getListingDataTasks.push(this.getListingImages(listingId))
     })
     await Promise.all(getListingDataTasks)
+    this.filterOutDuplicateListings()
+    return Object.values(this.listings)
   }
 
   async getIntialListings() {
@@ -119,6 +94,7 @@ export class ApartmentsDotComScraper {
       availabilityDate: new Date(),
       lastUpdatedAt: new Date(),
       listingUrl: `https://www.apartments.com/umw-cribs/${listingId}/`,
+      listingSource: "apartments.com",
       description: null,
       contactInfo: {
         email: null,
@@ -193,6 +169,10 @@ export class ApartmentsDotComScraper {
         headers: { "content-type": "application/json" },
       }
     )
+    if (response.status === 204) {
+      this.log("No images found", "getListingImages", listingId)
+      return
+    }
     if (response.status !== 200)
       throw new Error(
         this.buildLog(
@@ -217,6 +197,28 @@ export class ApartmentsDotComScraper {
     }
     this.listings[listingId].imageUrls = imageUrls
   }
+  filterOutDuplicateListings() {
+    const addressesSet: Set<string> = new Set()
+    const filteredListings: { [addressIdentifier: string]: Listing } = {}
+    for (const listingId in this.listings) {
+      const address =
+        this.listings[listingId].address.lineOne.toLowerCase() +
+        ":" +
+        (this.listings[listingId].address.lineTwo || "").toLowerCase()
+      if (!addressesSet.has(address)) {
+        addressesSet.add(address)
+        filteredListings[address] = this.listings[listingId]
+      } else if (
+        addressesSet.has(address) &&
+        this.listings[listingId].lastUpdatedAt >
+          filteredListings[address].lastUpdatedAt
+      ) {
+        filteredListings[address] = this.listings[listingId]
+      }
+    }
+    this.listings = filteredListings
+  }
+
   log(msg: string, caller: string, listingId?: string) {
     console.log(this.buildLog(msg, caller, listingId))
   }
