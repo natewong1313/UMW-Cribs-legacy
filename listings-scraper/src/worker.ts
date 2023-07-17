@@ -11,6 +11,7 @@
  *
  * Learn more at https://developers.cloudflare.com/workers/
  */
+import { user } from "@umw-cribs/db/schema.server"
 import { ApartmentsDotComScraper } from "./sites/apartments-dot-com"
 import { ZillowScraper } from "./sites/zillow"
 
@@ -56,5 +57,6 @@ export default {
     const zillowScraper = new ZillowScraper()
     const apartmentsDotComScraper = new ApartmentsDotComScraper()
     const zillowListings = await zillowScraper.start()
+    console.log(zillowListings)
   },
 }

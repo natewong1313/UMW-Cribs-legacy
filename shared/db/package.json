@@ -1,0 +1,23 @@
+{
+  "name": "@umw-cribs/db",
+  "version": "1.0.0",
+  "description": "Shared db schemas",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/natewong1313/UMW-Cribs.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/natewong1313/UMW-Cribs/issues"
+  },
+  "homepage": "https://github.com/natewong1313/UMW-Cribs#readme",
+  "dependencies": {
+    "@planetscale/database": "^1.8.0",
+    "drizzle-kit": "^0.19.6",
+    "drizzle-orm": "^0.27.2"
+  }
+}

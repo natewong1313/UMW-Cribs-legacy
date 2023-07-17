@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "deploy": "wrangler deploy",
-    "start": "wrangler dev --test-scheduled"
+    "start": "echo 'Running at http://127.0.0.1:8787/__scheduled' && wrangler dev --test-scheduled"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20230419.0",
@@ -14,7 +14,7 @@
   },
   "main": ".eslintrc.js",
   "dependencies": {
-    "@cityssm/street-name-normalize": "^0.1.1",
+    "@umw-cribs/db": "^1.0.0",
     "acorn": "^8.10.0",
     "acorn-jsx": "^5.3.2",
     "ajv": "^6.12.6",

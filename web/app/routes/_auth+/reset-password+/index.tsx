@@ -7,9 +7,9 @@ import {
   useLoaderData,
   useNavigation,
 } from "@remix-run/react"
+import { user as userSchema } from "@umw-cribs/db/schema.server"
 import { eq } from "drizzle-orm"
 import { z } from "zod"
-import { user as userSchema } from "@/lib/db-schema.server"
 import { sendPasswordResetLinkEmail } from "@/lib/email.server"
 
 export async function loader({ request, context }: LoaderArgs) {
