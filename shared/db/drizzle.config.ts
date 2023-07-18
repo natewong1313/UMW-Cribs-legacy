@@ -6,7 +6,7 @@ dotenv.config({
 })
 
 const config: Config = {
-  schema: "./app/lib/db-schema.server.ts",
+  schema: "./schema.server.ts",
   driver: "mysql2",
   dbCredentials: {
     connectionString: process.env.DATABASE_URL || "",

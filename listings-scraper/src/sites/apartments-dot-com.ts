@@ -60,7 +60,8 @@ export class ApartmentsDotComScraper {
         )
       )
     const placards = responseBody["placards"].filter(
-      (p: any) => !p["bedRange"].includes(" - ") && p["ad"] < 1
+      (p: any) =>
+        !p["bedRange"].includes(" - ") && (p["ad"] < 1 || p["ad"] === 6)
     )
     this.log(`Found ${placards.length} valid listings`, "getIntialListings")
     for (const placard of placards) {
@@ -71,8 +72,7 @@ export class ApartmentsDotComScraper {
   createInitialListingFromPlacard(placard: any) {
     const listingId = placard["k"]
     const address1: string = placard["address"]["lineOne"]
-    const address2 = placard["unitNumber"]
-    // const addressIdentifier = `${address1.toLowerCase()}:${address2 || -1}`
+    const address2 = placard["unitNumber"]?.replace(/^(?:APT|UNIT)\s*/i, "")
     const coords: [number, number] = placard["location"]
     this.listings[listingId] = {
       id: listingId,
@@ -102,6 +102,7 @@ export class ApartmentsDotComScraper {
       },
       imageUrls: [],
       mainImage: null,
+      isPreferredImageSource: false,
     }
     if (placard["primaryImage"]) {
       this.listings[listingId].mainImage = placard["primaryImage"]["url"]
@@ -149,7 +150,6 @@ export class ApartmentsDotComScraper {
     this.listings[listingId].sqft = parseInt(
       availabilityDetails["area"].replace(/\SF/g, "").replace(/,/g, "")
     )
-    console.log(availabilityDetails["availabilityDate"])
     this.listings[listingId].availabilityDate = new Date(
       availabilityDetails["availabilityDate"]
     )
@@ -223,6 +223,8 @@ export class ApartmentsDotComScraper {
     console.log(this.buildLog(msg, caller, listingId))
   }
   buildLog(msg: string, caller: string, listingId?: string) {
-    return `[apartments.com:${caller}${listingId && ":" + listingId}] ${msg}`
+    return `[apartments.com:${caller}${
+      listingId !== undefined ? ":" + listingId : ""
+    }] ${msg}`
   }
 }

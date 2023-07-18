@@ -127,6 +127,7 @@ export class ZillowScraper {
           ],
           mainImage:
             propertyDetails.media.propertyPhotoLinks.highResolutionLink,
+          isPreferredImageSource: true,
         }
       })
   }
@@ -196,7 +197,10 @@ export class ZillowScraper {
     const line1Match = address.match(addressLine1Pattern)
     const line2Match = address.match(addressLine2Pattern)
     const addressLine1 = line1Match && line1Match[1] ? line1Match[1] : ""
-    const addressLine2 = line2Match && line2Match[1] ? line2Match[1] : null
+    const addressLine2 =
+      line2Match && line2Match[1]
+        ? line2Match[1].replace(/^(?:APT|UNIT)\s*/i, "")
+        : null
 
     return { addressLine1, addressLine2 }
   }
@@ -204,6 +208,8 @@ export class ZillowScraper {
     console.log(this.buildLog(msg, caller, listingId))
   }
   buildLog(msg: string, caller: string, listingId?: string) {
-    return `[zillow:${caller}${listingId && ":" + listingId}] ${msg}`
+    return `[zillow:${caller}${
+      listingId !== undefined ? ":" + listingId : ""
+    }] ${msg}`
   }
 }

@@ -15,6 +15,7 @@ type RequestBody = {
 
 export default {
   async fetch(req: Request, env: Env) {
+    console.log(env.EMAIL_API_KEY)
     if (req.headers.get("x-api-key") !== env.EMAIL_API_KEY) {
       return new Response(null, { status: 401 })
     }

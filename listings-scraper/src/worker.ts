@@ -11,9 +11,9 @@
  *
  * Learn more at https://developers.cloudflare.com/workers/
  */
-import { user } from "@umw-cribs/db/schema.server"
 import { ApartmentsDotComScraper } from "./sites/apartments-dot-com"
 import { ZillowScraper } from "./sites/zillow"
+import { combineAndFilterListings } from "./utils"
 
 export interface Env {
   // Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
@@ -57,6 +57,10 @@ export default {
     const zillowScraper = new ZillowScraper()
     const apartmentsDotComScraper = new ApartmentsDotComScraper()
     const zillowListings = await zillowScraper.start()
-    console.log(zillowListings)
+    const apartmentsDotComListings = await apartmentsDotComScraper.start()
+    const listings = combineAndFilterListings([
+      ...zillowListings,
+      ...apartmentsDotComListings,
+    ])
   },
 }

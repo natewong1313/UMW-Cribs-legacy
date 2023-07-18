@@ -24,4 +24,5 @@ type Listing = {
   }
   imageUrls: string[]
   mainImage: string | null
+  isPreferredImageSource: boolean
 }

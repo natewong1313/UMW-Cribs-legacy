@@ -1,5 +1,5 @@
 {
-  "name": "listings-scraper",
+  "name": "@umw-cribs/listings-scraper",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -14,9 +14,11 @@
   },
   "main": ".eslintrc.js",
   "dependencies": {
+    "@cityssm/street-name-normalize": "^0.1.1",
     "@umw-cribs/db": "^1.0.0",
     "acorn": "^8.10.0",
     "acorn-jsx": "^5.3.2",
+    "addresser": "^1.1.20",
     "ajv": "^6.12.6",
     "ansi-regex": "^5.0.1",
     "ansi-styles": "^4.3.0",
