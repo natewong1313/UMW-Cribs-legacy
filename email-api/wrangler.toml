@@ -5,6 +5,9 @@ compatibility_date = "2023-07-04"
 [dev]
 port=4000
 
+[triggers]
+crons = ["*/30 * * * *"]
+
 # Variable bindings. These are arbitrary, plaintext strings (similar to environment variables)
 # Note: Use secrets to store sensitive data.
 # Docs: https://developers.cloudflare.com/workers/platform/environment-variables
