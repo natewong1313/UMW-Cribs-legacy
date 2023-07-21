@@ -1,9 +1,9 @@
 type Listing = {
-  id: string
+  id: string | null
   price: number
   bedrooms: number
   bathrooms: number
-  sqft: number | null
+  sqft: number
   address: {
     lineOne: string
     lineTwo: string | null

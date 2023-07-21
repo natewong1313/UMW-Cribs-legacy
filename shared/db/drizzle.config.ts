@@ -2,7 +2,7 @@ import * as dotenv from "dotenv"
 import type { Config } from "drizzle-kit"
 
 dotenv.config({
-  path: ".dev.vars",
+  path: "../../web/.dev.vars",
 })
 
 const config: Config = {

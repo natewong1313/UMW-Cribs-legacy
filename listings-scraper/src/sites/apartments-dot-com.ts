@@ -81,7 +81,7 @@ export class ApartmentsDotComScraper {
       ),
       bedrooms: -1,
       bathrooms: -1,
-      sqft: null,
+      sqft: -1,
       address: {
         lineOne: address1,
         lineTwo: address2,
@@ -119,23 +119,23 @@ export class ApartmentsDotComScraper {
         headers: { "content-type": "application/json" },
       }
     )
-    if (response.status !== 200)
-      throw new Error(
-        this.buildLog(
-          `Got status ${response.status}, body ${await response.text()}`,
-          "getListingDetails",
-          listingId
-        )
+    if (response.status !== 200) {
+      this.log(
+        `Got status ${response.status}, body ${await response.text()}`,
+        "getListingDetails",
+        listingId
       )
+      return
+    }
     const responseBody = safeJsonParse(await response.text())
-    if (!responseBody)
-      throw new Error(
-        this.buildLog(
-          `Could not parse response body ${await response.text()}`,
-          "getListingDetails",
-          listingId
-        )
+    if (!responseBody) {
+      this.log(
+        `Could not parse response body ${await response.text()}`,
+        "getListingDetails",
+        listingId
       )
+      return
+    }
     this.log("Parsing response body", "getListingDetails", listingId)
     const availabilityDetails = responseBody["availabilities"].filter(
       (availability: any) => availability["name"] === "All"
@@ -147,14 +147,17 @@ export class ApartmentsDotComScraper {
     this.listings[listingId].bathrooms = parseFloat(
       availabilityDetails["bathNum"]
     )
-    this.listings[listingId].sqft = parseInt(
+    const sqft = parseInt(
       availabilityDetails["area"].replace(/\SF/g, "").replace(/,/g, "")
     )
+    this.listings[listingId].sqft = !isNaN(sqft) ? sqft : -1
     this.listings[listingId].availabilityDate = new Date(
       availabilityDetails["availabilityDate"]
     )
     this.listings[listingId].description = responseBody["desc"] || null
-    this.listings[listingId].lastUpdatedAt = responseBody["lastModifiedDate"]
+    this.listings[listingId].lastUpdatedAt = new Date(
+      responseBody["lastModifiedDate"]
+    )
   }
   async getListingImages(listingId: string) {
     this.log("Making request", "getListingImages", listingId)
@@ -173,23 +176,23 @@ export class ApartmentsDotComScraper {
       this.log("No images found", "getListingImages", listingId)
       return
     }
-    if (response.status !== 200)
-      throw new Error(
-        this.buildLog(
-          `Got status ${response.status}, body ${await response.text()}`,
-          "getListingImages",
-          listingId
-        )
+    if (response.status !== 200) {
+      this.log(
+        `Got status ${response.status}, body ${await response.text()}`,
+        "getListingImages",
+        listingId
       )
+      return
+    }
     const responseBody = safeJsonParse(await response.text())
-    if (!responseBody || !responseBody["items"])
-      throw new Error(
-        this.buildLog(
-          `Could not parse response body ${await response.text()}`,
-          "getListingImages",
-          listingId
-        )
+    if (!responseBody || !responseBody["items"]) {
+      this.log(
+        `Could not parse response body ${await response.text()}`,
+        "getListingImages",
+        listingId
       )
+      return
+    }
     this.log("Parsing response body", "getListingImages", listingId)
     const imageUrls = responseBody["items"].map((image: any) => image["u"])
     if (this.listings[listingId].mainImage) {
