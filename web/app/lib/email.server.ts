@@ -6,7 +6,7 @@ export const sendPasswordResetLinkEmail = async (
   resetToken: string,
   env: TypesafeEnv
 ) => {
-  const resetLink = `${env.BASE_URL}/reset-password?token=${resetToken}`
+  const resetLink = `${env.BASE_URL}/reset-password/${resetToken}`
   const options = {
     method: "POST",
     headers: {
