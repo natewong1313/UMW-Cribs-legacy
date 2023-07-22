@@ -1,5 +1,5 @@
 type Listing = {
-  id: string | null
+  id: string
   price: number
   bedrooms: number
   bathrooms: number

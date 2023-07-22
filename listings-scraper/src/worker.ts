@@ -52,6 +52,7 @@ export default {
     console.log(previousListings)
 
     //update any listings that are in previousListings and change the id
+    const listingIds: string[] = []
     listings = listings.map((listing) => {
       const previousListing = previousListings.find((previousListing) => {
         return (
@@ -59,42 +60,198 @@ export default {
           previousListing.addressLineTwo === listing.address.lineTwo
         )
       })
+      if (previousListing) listingIds.push(previousListing.id)
       return {
         ...listing,
-        id: previousListing ? previousListing.id : null,
+        id: previousListing ? previousListing.id : "",
       }
     })
-    console.log(listings)
-    await db.transaction(async (tx) => {
-      await tx.delete(dbListing)
-      await tx.insert(dbListing).values(
-        listings.map((listing: Listing) => ({
-          id: listing.id ? listing.id : uuid(),
-          price: listing.price,
-          bedrooms: listing.bedrooms,
-          bathrooms: listing.bathrooms,
-          sqft: listing.sqft,
-          addressLineOne: listing.address.lineOne,
-          addressLineTwo: listing.address.lineTwo,
-          city: listing.address.city,
-          state: listing.address.state,
-          zip: listing.address.zip,
-          latitude: listing.latitude,
-          longitude: listing.longitude,
-          availabilityDate: listing.availabilityDate,
-          lastUpdatedAt: listing.lastUpdatedAt,
-          listingUrl: listing.listingUrl,
-          listingSource: listing.listingSource,
-          description: listing.description,
-          contactInfoEmail: listing.contactInfo.email,
-          contactInfoPhone: listing.contactInfo.phone,
-          imageUrls: listing.imageUrls,
-          mainImage: listing.mainImage,
-          isPreferredImageSource: listing.isPreferredImageSource,
-        }))
+
+    const unavailableIds = previousListings
+      .filter((previousListing) => {
+        return !listingIds.includes(previousListing.id)
+      })
+      .map((listing) => listing.id)
+    console.log(unavailableIds)
+    if (unavailableIds.length > 0) {
+      // set any listings that are no longer available to unavailable
+      await db
+        .update(dbListing)
+        .set({
+          isAvailable: false,
+        })
+        .where(inArray(dbListing.id, unavailableIds))
+    }
+
+    const existingListings = listings.filter((listing) => listing.id !== "")
+    if (existingListings.length > 0) {
+      // update any existing listings
+      await db.transaction(async (tx) => {
+        existingListings.forEach(async (listing) => {
+          await tx
+            .update(dbListing)
+            .set({
+              price: listing.price,
+              bedrooms: listing.bedrooms,
+              bathrooms: listing.bathrooms,
+              sqft: listing.sqft,
+              addressLineOne: listing.address.lineOne,
+              addressLineTwo: listing.address.lineTwo,
+              city: listing.address.city,
+              state: listing.address.state,
+              zip: listing.address.zip,
+              latitude: listing.latitude,
+              longitude: listing.longitude,
+
+              availabilityDate: listing.availabilityDate,
+              lastUpdatedAt: listing.lastUpdatedAt,
+              listingUrl: listing.listingUrl,
+              listingSource: listing.listingSource,
+              description: listing.description,
+              contactInfoEmail: listing.contactInfo.email,
+              contactInfoPhone: listing.contactInfo.phone,
+              imageUrls: listing.imageUrls,
+              mainImage: listing.mainImage,
+              isPreferredImageSource: listing.isPreferredImageSource,
+              isAvailable: true,
+            })
+            .where(eq(dbListing.id, listing.id))
+        })
+      })
+    }
+
+    const newListings = listings.filter((listing) => listing.id === "")
+    if (newListings.length > 0) {
+      await db.insert(dbListing).values(
+        newListings
+          .filter((listing) => !listing.id)
+          .map((listing: Listing) => ({
+            id: uuid(),
+            price: listing.price,
+            bedrooms: listing.bedrooms,
+            bathrooms: listing.bathrooms,
+            sqft: listing.sqft,
+            addressLineOne: listing.address.lineOne,
+            addressLineTwo: listing.address.lineTwo,
+            city: listing.address.city,
+            state: listing.address.state,
+            zip: listing.address.zip,
+            latitude: listing.latitude,
+            longitude: listing.longitude,
+            availabilityDate: listing.availabilityDate,
+            lastUpdatedAt: listing.lastUpdatedAt,
+            listingUrl: listing.listingUrl,
+            listingSource: listing.listingSource,
+            description: listing.description,
+            contactInfoEmail: listing.contactInfo.email,
+            contactInfoPhone: listing.contactInfo.phone,
+            imageUrls: listing.imageUrls,
+            mainImage: listing.mainImage,
+            isPreferredImageSource: listing.isPreferredImageSource,
+            isAvailable: true,
+          }))
       )
-    })
-    // // find any previousListings that arent in the new listings
+    }
+
+    // // delete listings that weren't found
+    // if (idsToDelete.length > 0) {
+    //   await db.delete(dbListing).where(inArray(dbListing.id, idsToDelete))
+    // }
+
+    // await db.transaction(async (tx) => {
+    //   await tx.delete(dbListing).where(inArray(dbListing.id, idsToDelete))
+    //   // update listings that were found
+    //   existingListings.forEach(async (listing) => {
+    //     await tx
+    //       .update(dbListing)
+    //       .set({
+    //         price: listing.price,
+    //         bedrooms: listing.bedrooms,
+    //         bathrooms: listing.bathrooms,
+    //         sqft: listing.sqft,
+    //         addressLineOne: listing.address.lineOne,
+    //         addressLineTwo: listing.address.lineTwo,
+    //         city: listing.address.city,
+    //         state: listing.address.state,
+    //         zip: listing.address.zip,
+    //         latitude: listing.latitude,
+    //         longitude: listing.longitude,
+    //         availabilityDate: listing.availabilityDate,
+    //         lastUpdatedAt: listing.lastUpdatedAt,
+    //         listingUrl: listing.listingUrl,
+    //         listingSource: listing.listingSource,
+    //         description: listing.description,
+    //         contactInfoEmail: listing.contactInfo.email,
+    //         contactInfoPhone: listing.contactInfo.phone,
+    //         imageUrls: listing.imageUrls,
+    //         mainImage: listing.mainImage,
+    //         isPreferredImageSource: listing.isPreferredImageSource,
+    //       })
+    //       .where(eq(dbListing.id, listing.id))
+    //   })
+    //   if (newListings.length > 0) {
+    //     // insert new listings
+    //     await tx.insert(dbListing).values(
+    //       newListings.map((listing: Listing) => ({
+    //         id: uuid(),
+    //         price: listing.price,
+    //         bedrooms: listing.bedrooms,
+    //         bathrooms: listing.bathrooms,
+    //         sqft: listing.sqft,
+    //         addressLineOne: listing.address.lineOne,
+    //         addressLineTwo: listing.address.lineTwo,
+    //         city: listing.address.city,
+    //         state: listing.address.state,
+    //         zip: listing.address.zip,
+    //         latitude: listing.latitude,
+    //         longitude: listing.longitude,
+    //         availabilityDate: listing.availabilityDate,
+    //         lastUpdatedAt: listing.lastUpdatedAt,
+    //         listingUrl: listing.listingUrl,
+    //         listingSource: listing.listingSource,
+    //         description: listing.description,
+    //         contactInfoEmail: listing.contactInfo.email,
+    //         contactInfoPhone: listing.contactInfo.phone,
+    //         imageUrls: listing.imageUrls,
+    //         mainImage: listing.mainImage,
+    //         isPreferredImageSource: listing.isPreferredImageSource,
+    //       }))
+    //     )
+    //   }
+    // })
+
+    // console.log(listings)
+    // await db.transaction(async (tx) => {
+    //   await tx.delete(dbListing)
+    //   await tx.insert(dbListing).values(
+    //     listings.map((listing: Listing) => ({
+    //       id: listing.id ? listing.id : uuid(),
+    //       price: listing.price,
+    //       bedrooms: listing.bedrooms,
+    //       bathrooms: listing.bathrooms,
+    //       sqft: listing.sqft,
+    //       addressLineOne: listing.address.lineOne,
+    //       addressLineTwo: listing.address.lineTwo,
+    //       city: listing.address.city,
+    //       state: listing.address.state,
+    //       zip: listing.address.zip,
+    //       latitude: listing.latitude,
+    //       longitude: listing.longitude,
+    //       availabilityDate: listing.availabilityDate,
+    //       lastUpdatedAt: listing.lastUpdatedAt,
+    //       listingUrl: listing.listingUrl,
+    //       listingSource: listing.listingSource,
+    //       description: listing.description,
+    //       contactInfoEmail: listing.contactInfo.email,
+    //       contactInfoPhone: listing.contactInfo.phone,
+    //       imageUrls: listing.imageUrls,
+    //       mainImage: listing.mainImage,
+    //       isPreferredImageSource: listing.isPreferredImageSource,
+    //     }))
+    //   )
+    // })
+
+    // find any previousListings that arent in the new listings
     // const deletedListingIds = previousListings
     //   .filter((previousListing) => {
     //     return !listings.find((listing) => {

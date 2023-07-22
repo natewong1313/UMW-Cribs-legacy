@@ -60,5 +60,14 @@ export const listing = mysqlTable("listing", {
   imageUrls: json("image_urls"),
   mainImage: varchar("main_image", { length: 255 }),
   isPreferredImageSource: boolean("is_preferred_image_source").notNull(),
+  isAvailable: boolean("is_available").notNull(),
 })
 export type Listing = InferModel<typeof listing>
+
+export const userLikedListings = mysqlTable("user_liked_listings", {
+  userId: varchar("user_id", { length: 15 }).primaryKey(),
+  listingId: varchar("listing_id", { length: 255 }),
+  createdAt: timestamp("created_at", { fsp: 2 })
+    .notNull()
+    .default(sql`(now(2))`),
+})
