@@ -67,7 +67,8 @@ export class ZillowScraper {
           "x-datadog-trace-id": "567518142335060153",
           "x-device-id": "7A9731A0-2C7E-4B58-BB49-98AA0FD22B52",
           "x-device-model": "iPhone",
-          "x-px-authorization": "3",
+          "x-px-authorization":
+            "3:f74a2e585760931c2aa1413b91f80966b938e1c3df23796ecd8083f2498b3fd6:f4tE9JF1Mr+IUCVPzfbTbWLDQYiFzGrxwj4kDPsvWEU+2DsIv/atIlCm47988J+6+p9mnX0s0IebGeD3x3z2bQ==:1000:9JbQZjhNTVHyuELS9i1aHJCFzGSvv62PYwfTHYPh6DYBXqg9SJtiDsnjx8jGykurNPzah7E44opkzIReGuypel2U1iQN1Hda9CEZPekogDkTX1ELsS3HFnJk6goOpEA0sqNfeNdCSrai+lmda9hd1N7XWF+/1HB0+4fCnjN+j6suEodnTOgNYGqR85CxasP7WiJczbvTss02lmQbv0DIvA==",
           "x-system": "iOS",
           "x-system-version": "16.5.1",
         },
@@ -147,7 +148,8 @@ export class ZillowScraper {
           "x-datadog-trace-id": "7856713714654977686",
           "x-device-id": "7A9731A0-2C7E-4B58-BB49-98AA0FD22B52",
           "x-device-model": "iPhone",
-          "x-px-authorization": "3",
+          "x-px-authorization":
+            "3:f74a2e585760931c2aa1413b91f80966b938e1c3df23796ecd8083f2498b3fd6:f4tE9JF1Mr+IUCVPzfbTbWLDQYiFzGrxwj4kDPsvWEU+2DsIv/atIlCm47988J+6+p9mnX0s0IebGeD3x3z2bQ==:1000:9JbQZjhNTVHyuELS9i1aHJCFzGSvv62PYwfTHYPh6DYBXqg9SJtiDsnjx8jGykurNPzah7E44opkzIReGuypel2U1iQN1Hda9CEZPekogDkTX1ELsS3HFnJk6goOpEA0sqNfeNdCSrai+lmda9hd1N7XWF+/1HB0+4fCnjN+j6suEodnTOgNYGqR85CxasP7WiJczbvTss02lmQbv0DIvA==",
           "x-system": "iOS",
           "x-system-version": "16.5.1",
         },

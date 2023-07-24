@@ -56,8 +56,11 @@ export default {
     listings = listings.map((listing) => {
       const previousListing = previousListings.find((previousListing) => {
         return (
-          previousListing.addressLineOne === listing.address.lineOne &&
-          previousListing.addressLineTwo === listing.address.lineTwo
+          `${previousListing.addressLineOne} ${
+            previousListing.addressLineTwo || ""
+          }` === `${listing.address.lineOne} ${listing.address.lineTwo || ""}`
+          // previousListing.addressLineOne === listing.address.lineOne &&
+          // previousListing.addressLineTwo === listing.address.lineTwo
         )
       })
       if (previousListing) listingIds.push(previousListing.id)
