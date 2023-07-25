@@ -18,6 +18,7 @@ export default {
     "lucia-auth/polyfill/node",
     "@lucia-auth/oauth",
     "@lucia-auth/oauth/providers",
+    "@umw-cribs/db/schema.server",
     // bundle verything except the virtual module for the static content manifest provided by wrangler
     /^(?!.*\b__STATIC_CONTENT_MANIFEST\b).*$/,
   ],

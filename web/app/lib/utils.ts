@@ -1,5 +1,7 @@
 import { Submission } from "@conform-to/react"
+import { clsx, type ClassValue } from "clsx"
 import { LuciaError } from "lucia-auth"
+import { twMerge } from "tailwind-merge"
 
 type AuthErrorReturn = {
   error: Record<string, string>
@@ -61,4 +63,8 @@ export function stripPasswordFromSubmission(submission: Submission) {
     payload: { email: submission.payload.email },
     value: { email: submission.payload.email },
   }
+}
+
+export function cnMerge(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
 }

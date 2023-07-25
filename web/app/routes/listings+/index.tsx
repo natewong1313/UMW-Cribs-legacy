@@ -1,11 +1,17 @@
 import { ActionArgs, json, type LoaderArgs } from "@remix-run/cloudflare"
 import { Form, Link, useLoaderData } from "@remix-run/react"
-import { listing, userLikedListings } from "@umw-cribs/db/schema.server"
+import {
+  type Listing as DbListing,
+  listing as dbListing,
+  userLikedListings,
+} from "@umw-cribs/db/schema.server"
 import { eq } from "drizzle-orm"
+import Container from "@/components/Container"
+import Navbar from "@/components/Navbar"
 
 export const loader = async ({ request, context }: LoaderArgs) => {
   const headers = new Headers()
-  const listings = await context.db.select().from(listing)
+  const listings = await context.db.select().from(dbListing)
   const authRequest = context.auth.handleRequest(request, headers)
   const { user } = await authRequest.validateUser()
   if (!user) return json({ listings, likedListingIds: [] }, { headers })
@@ -48,32 +54,55 @@ export default function ListingsPage() {
   const { listings, likedListingIds } = useLoaderData<typeof loader>()
   return (
     <div>
-      ListingsPage
-      <ul>
-        {listings.map((listing) => (
-          <li key={listing.id}>
-            <Form
-              method="post"
-              className="flex flex-row items-center gap-10 space-y-2 border"
-            >
-              <Link to={`/listings/${listing.id}`}>
-                {listing.addressLineOne} {listing.addressLineTwo}{" "}
-                {listing.listingSource}
-              </Link>
-              <input name="id" type="hidden" value={listing.id} />
-              {likedListingIds.includes(listing.id) ? (
-                <button className="rounded bg-gray-500 px-2 py-1 text-white">
-                  Unlike
-                </button>
-              ) : (
-                <button className="rounded bg-blue-500 px-2 py-1 text-white">
-                  Like
-                </button>
-              )}
-            </Form>
-          </li>
-        ))}
-      </ul>
+      <Navbar />
+      <Container>
+        <h1 className="text-center text-2xl font-bold">
+          Browse the latest listings
+        </h1>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+          {listings.map((listing) => (
+            //@ts-ignore
+            <Listing key={listing.id} listing={listing} />
+          ))}
+        </div>
+      </Container>
     </div>
+  )
+}
+
+type ListingProps = {
+  listing: DbListing
+}
+const Listing = ({ listing }: ListingProps) => {
+  const imageUrls = listing.imageUrls as string[]
+  const imageUrl = listing.mainImage
+    ? listing.mainImage
+    : imageUrls.length > 0
+    ? imageUrls[0]
+    : ""
+  return (
+    <Link to={"/listings/" + listing.id} className="w-fit">
+      <div>
+        <div className="aspect-[4/3] w-full overflow-hidden rounded-lg">
+          <img
+            src={imageUrl}
+            alt={listing.addressLineOne}
+            width={0}
+            height={0}
+            className="object-fit h-full w-full transition duration-200 ease-in-out group-hover:scale-110"
+          />
+        </div>
+        <div className="py-2">
+          <h1 className="text-xl font-semibold">
+            ${listing.price}{" "}
+            <span className="text-base font-medium text-gray-500">/month</span>
+          </h1>
+          <p className="text-gray-500">2 bds • 1.5 bths • 2,000 sqft</p>
+          <p>
+            {listing.addressLineOne} {listing.addressLineTwo}
+          </p>
+        </div>
+      </div>
+    </Link>
   )
 }

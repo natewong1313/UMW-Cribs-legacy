@@ -1,6 +1,20 @@
+import {
+  ArrowRight,
+  ArrowURightDown,
+  ArrowUpRight,
+  Bell,
+  DiamondsFour,
+  Funnel,
+  SquaresFour,
+} from "@phosphor-icons/react"
 import { json } from "@remix-run/cloudflare"
 import type { LoaderArgs, V2_MetaFunction } from "@remix-run/cloudflare"
-import { useLoaderData } from "@remix-run/react"
+import { Link, useLoaderData } from "@remix-run/react"
+import HouseIllustration from "@/assets/house_illustration.svg"
+import Container from "@/components/Container"
+import Footer from "@/components/Footer"
+import Navbar from "@/components/Navbar"
+import { Button } from "@/components/ui/Button"
 
 export const meta: V2_MetaFunction = () => {
   return [
@@ -20,39 +34,137 @@ export default function Index() {
   const data = useLoaderData<typeof loader>()
   return (
     <div>
-      <h1 className="font-bold text-red-500">Is dev: {"" + data.isDev}</h1>
-      <h2 className="font-bold text-blue-500">Signed in: {"" + !!data.user}</h2>
-      {data.user && (
-        <div>
-          <h3 className="font-bold text-green-500">User:</h3>
-          <pre>{JSON.stringify(data.user, null, 2)}</pre>
+      <Navbar />
+      <HeroSection />
+      {/* <Container>
+        <h1 className="text-center text-2xl font-bold">
+          Browse the latest listings
+        </h1>
+      </Container> */}
+      <Container id="about" className="py-20">
+        <h1 className="text-center text-2xl font-bold">Why use UMW Cribs?</h1>
+        <div className="mt-12 grid grid-cols-3 gap-6">
+          <div className="flex flex-col items-center">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
+              <span className="text-blue-500">
+                <DiamondsFour size={32} />
+              </span>
+            </div>
+            <h2 className="mt-4 text-xl font-bold">
+              All listings in one place
+            </h2>
+            <p className="mt-2 text-center text-gray-500">
+              We aggregate listings from 10+ sites and put them all in one place
+            </p>
+          </div>
+          <div className="flex flex-col items-center">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
+              <span className="text-blue-500">
+                <Bell size={32} />
+              </span>
+            </div>
+            <h2 className="mt-4 text-xl font-bold">Stay in the loop</h2>
+            <p className="mt-2 text-center text-gray-500">
+              Get instantly notified about new listings and updates
+            </p>
+          </div>
+          <div className="flex flex-col items-center">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
+              <span className="text-blue-500">
+                <Funnel size={32} />
+              </span>
+            </div>
+            <h2 className="mt-4 text-xl font-bold">Advanced Filters</h2>
+            <p className="mt-2 text-center text-gray-500">
+              Filter listings by price, distance from school, and more
+            </p>
+          </div>
         </div>
-      )}
-      <ul>
-        <li>
-          <a
-            target="_blank"
-            href="https://remix.run/tutorials/blog"
-            rel="noreferrer"
-          >
-            15m Quickstart Blog Tutorial
-          </a>
-        </li>
-        <li>
-          <a
-            target="_blank"
-            href="https://remix.run/tutorials/jokes"
-            rel="noreferrer"
-          >
-            Deep Dive Jokes App Tutorial
-          </a>
-        </li>
-        <li>
-          <a target="_blank" href="https://remix.run/docs" rel="noreferrer">
-            Remix Docs
-          </a>
-        </li>
-      </ul>
+      </Container>
+      <GetStartedSection />
+      <Footer />
     </div>
+  )
+}
+
+const HeroSection = () => {
+  return (
+    <Container className="grid grid-cols-2 pb-36 pt-20">
+      <div className="pt-8">
+        <h1 className="text-6xl font-extrabold leading-tight">
+          Find the{" "}
+          <span
+            className="bg-gradient-to-br from-blue-400 to-blue-600 bg-clip-text text-transparent"
+            style={{ WebkitBackgroundClip: "text" }}
+          >
+            perfect
+          </span>{" "}
+          place to live at UMW
+        </h1>
+        <p className="mt-3 text-xl text-gray-500">
+          Our mission is to help you get connected with the home of your dreams
+          for the upcoming school year
+        </p>
+        <Button variant="primary" className="mr-4 mt-6" asChild>
+          <Link to="/listings">
+            Start browsing{" "}
+            <span className="ml-1.5 text-sky-200">
+              <ArrowUpRight size={18} />
+            </span>
+          </Link>
+        </Button>
+        <Button variant="outline" asChild>
+          <a href="#about">
+            Learn more
+            <span className="ml-1.5 text-gray-500">
+              <ArrowURightDown size={18} />
+            </span>
+          </a>
+        </Button>
+      </div>
+      <div className="flex justify-center">
+        <img
+          src={HouseIllustration}
+          alt="House Illustration"
+          width={420}
+          draggable={false}
+        />
+      </div>
+    </Container>
+  )
+}
+
+const GetStartedSection = () => {
+  return (
+    <Container
+      sectionClassName="border-t border-b border-gray-200 bg-gray-50"
+      className="py-16"
+    >
+      <div className="flex flex-col items-center">
+        <h1 className="text-3xl font-bold">Get started with UMW Cribs</h1>
+        <p className="mt-2 max-w-xl text-center text-gray-700">
+          You're one step closer to finding the crib of your dreams. Use the
+          buttons below to browse listings or create an account.
+        </p>
+        <div className="mt-5 flex">
+          <Button variant="primary" className="mr-4" asChild>
+            <Link to="/listings">
+              Start browsing{" "}
+              <span className="ml-1.5 text-sky-200">
+                <ArrowUpRight size={18} />
+              </span>
+            </Link>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link to="/signup">
+              Sign up{" "}
+              <span className="ml-1.5 text-gray-500">
+                <ArrowRight size={18} />
+              </span>
+            </Link>
+          </Button>
+        </div>
+      </div>
+    </Container>
   )
 }
