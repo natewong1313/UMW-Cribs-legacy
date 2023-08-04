@@ -1,6 +1,5 @@
 import { planetscale } from "@lucia-auth/adapter-mysql"
 import { google } from "@lucia-auth/oauth/providers"
-// import { idToken } from "@lucia-auth/tokens"
 import type { Connection } from "@planetscale/database"
 import { lucia } from "lucia"
 import { web } from "lucia/middleware"
@@ -24,6 +23,7 @@ export const createAuthenticator = (
       return {
         // IMPORTANT!!!!
         // `userId` included by default!!
+        providerId: data.providerId,
         email: data.email,
         firstName: data.firstName,
         lastName: data.lastName,
@@ -35,15 +35,6 @@ export const createAuthenticator = (
   })
 }
 export type Authenticator = ReturnType<typeof createAuthenticator>
-
-// export const createPasswordResetTokenHandler = (auth: Authenticator) =>
-//   // @ts-ignore
-//   idToken(auth, "password-reset", {
-//     expiresIn: 60 * 60,
-//   })
-// export type PasswordResetTokenHandler = ReturnType<
-//   typeof createPasswordResetTokenHandler
-// >
 
 export const createGoogleAuthenticator = (
   auth: Authenticator,

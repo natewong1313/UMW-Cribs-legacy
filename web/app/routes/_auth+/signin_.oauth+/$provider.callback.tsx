@@ -23,6 +23,7 @@ export async function loader({ request, context }: LoaderArgs) {
       // create a new user if the user does not exist
       return await createUser({
         attributes: {
+          providerId: "Google",
           email: googleUser.email,
           firstName: googleUser.given_name,
           lastName: googleUser.family_name,

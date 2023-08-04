@@ -11,7 +11,10 @@ import {
 
 export const user = mysqlTable("auth_user", {
   id: varchar("id", { length: 15 }).primaryKey(),
+  providerId: varchar("providerId", { length: 256 }).notNull(),
   email: varchar("email", { length: 256 }).notNull(),
+  firstName: varchar("firstName", { length: 256 }).notNull(),
+  lastName: varchar("lastName", { length: 256 }).notNull(),
   emailVerifiedAt: timestamp("email_verified", { fsp: 2 }),
   createdAt: timestamp("created_at", { fsp: 2 })
     .notNull()
@@ -31,11 +34,16 @@ export type Session = InferModel<typeof session>
 export const key = mysqlTable("auth_key", {
   id: varchar("id", { length: 255 }).primaryKey(),
   userId: varchar("user_id", { length: 15 }).notNull(),
-  primaryKey: boolean("primary_key").notNull(),
   hashedPassword: varchar("hashed_password", { length: 255 }),
-  expires: bigint("expires", { mode: "number" }),
 })
 export type Key = InferModel<typeof key>
+
+export const passwordResetTokens = mysqlTable("password_reset_tokens", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId: varchar("user_id", { length: 15 }).notNull(),
+  expiresAt: timestamp("expires_at", { fsp: 2 }).notNull(),
+})
+export type PasswordResetToken = InferModel<typeof passwordResetTokens>
 
 export const listing = mysqlTable("listing", {
   id: varchar("id", { length: 255 }).primaryKey(),
@@ -65,8 +73,8 @@ export const listing = mysqlTable("listing", {
 export type Listing = InferModel<typeof listing>
 
 export const userLikedListings = mysqlTable("user_liked_listings", {
-  userId: varchar("user_id", { length: 15 }).primaryKey(),
-  listingId: varchar("listing_id", { length: 255 }),
+  userId: varchar("user_id", { length: 15 }).notNull(),
+  listingId: varchar("listing_id", { length: 255 }).notNull(),
   createdAt: timestamp("created_at", { fsp: 2 })
     .notNull()
     .default(sql`(now(2))`),

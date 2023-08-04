@@ -58,7 +58,6 @@ export default {
         env,
         db: drizzle(dbConnection),
         auth,
-        // passwordResetToken: createPasswordResetTokenHandler(auth),
         googleAuth: createGoogleAuthenticator(
           auth,
           env.GOOGLE_CLIENT_ID,

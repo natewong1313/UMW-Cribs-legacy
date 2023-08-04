@@ -7,8 +7,12 @@ import {
   useLoaderData,
   useNavigation,
 } from "@remix-run/react"
-import { user as userSchema } from "@umw-cribs/db/schema.server"
+import {
+  passwordResetTokens,
+  user as userSchema,
+} from "@umw-cribs/db/schema.server"
 import { eq } from "drizzle-orm"
+import { generateRandomString } from "lucia/utils"
 import { z } from "zod"
 import { sendPasswordResetLinkEmail } from "@/lib/email.server"
 
@@ -38,21 +42,31 @@ export async function action({ request, context }: ActionArgs) {
       { status: 400 }
     )
   }
-  // const user = context.auth.transformDatabaseUser(foundUsers[0])
-  // const resetToken = await context.passwordResetToken.issue(user.userId)
-  // await sendPasswordResetLinkEmail(
-  //   user.email,
-  //   resetToken.toString(),
-  //   context.env
-  // )
-  // const session = await context.session.get(request.headers.get("Cookie"))
-  // session.flash(
-  //   "message",
-  //   "Please check your email for the link to reset your password"
-  // )
+  const user = foundUsers[0]
+  if (user.providerId !== "email") {
+    return json(
+      {
+        ...submission,
+        error: { "": `Cannot reset a ${user.providerId} account` },
+      },
+      { status: 400 }
+    )
+  }
+  const resetToken = generateRandomString(63)
+  await context.db.insert(passwordResetTokens).values({
+    id: resetToken,
+    userId: user.id,
+    expiresAt: new Date(Date.now() + 1000 * 60 * 60),
+  })
+  await sendPasswordResetLinkEmail(user.email, resetToken, context.env)
+  const session = await context.session.get(request.headers.get("Cookie"))
+  session.flash(
+    "message",
+    "Please check your email for the link to reset your password"
+  )
   return json(submission, {
     headers: {
-      // "Set-Cookie": await context.session.commit(session),
+      "Set-Cookie": await context.session.commit(session),
     },
   })
 }

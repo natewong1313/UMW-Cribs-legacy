@@ -24,7 +24,6 @@ declare module "@remix-run/cloudflare" {
     env: TypesafeEnv
     db: PlanetScaleDatabase<Record<string, never>>
     auth: Authenticator
-    // passwordResetToken: PasswordResetTokenHandler
     googleAuth: GoogleAuthenticator
     is_dev: boolean
     session: SessionStorage

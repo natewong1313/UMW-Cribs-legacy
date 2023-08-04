@@ -2,6 +2,7 @@
 declare namespace Lucia {
   type Auth = import("@/lib/auth.server").Authenticator
   type DatabaseUserAttributes = {
+    providerId: string
     email: string
     firstName: string
     lastName: string

@@ -61,6 +61,7 @@ export async function action({ request, context }: ActionArgs) {
         password: submission.value.password,
       },
       attributes: {
+        providerId: "email",
         email: submission.value.email,
         firstName: submission.value.firstName,
         lastName: submission.value.lastName,
