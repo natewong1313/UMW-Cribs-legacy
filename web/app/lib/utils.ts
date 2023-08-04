@@ -1,6 +1,6 @@
 import { Submission } from "@conform-to/react"
 import { clsx, type ClassValue } from "clsx"
-import { LuciaError } from "lucia-auth"
+import { LuciaError } from "lucia"
 import { twMerge } from "tailwind-merge"
 
 type AuthErrorReturn = {

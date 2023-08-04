@@ -1,15 +1,14 @@
-import {
-  ArrowRight,
-  ArrowURightDown,
-  ArrowUpRight,
-  Bell,
-  DiamondsFour,
-  Funnel,
-  SquaresFour,
-} from "@phosphor-icons/react"
 import { json } from "@remix-run/cloudflare"
 import type { LoaderArgs, V2_MetaFunction } from "@remix-run/cloudflare"
 import { Link, useLoaderData } from "@remix-run/react"
+import {
+  IconArrowRight,
+  IconArrowUpRight,
+  IconBellCheck,
+  IconCornerRightDown,
+  IconFilter,
+  IconLayoutGrid,
+} from "@tabler/icons-react"
 import HouseIllustration from "@/assets/house_illustration.svg"
 import Container from "@/components/Container"
 import Footer from "@/components/Footer"
@@ -24,63 +23,23 @@ export const meta: V2_MetaFunction = () => {
 }
 
 export const loader = async ({ request, context }: LoaderArgs) => {
-  const headers = new Headers()
-  const authRequest = context.auth.handleRequest(request, headers)
-  const { user } = await authRequest.validateUser()
-  return json({ isDev: context.is_dev, user }, { headers })
+  const authRequest = context.auth.handleRequest(request)
+  const session = await authRequest.validate()
+  return json({ isDev: context.is_dev, user: session?.user ?? null })
 }
 
 export default function Index() {
-  const data = useLoaderData<typeof loader>()
+  const { user } = useLoaderData<typeof loader>()
   return (
     <div>
-      <Navbar />
+      <Navbar user={user} />
       <HeroSection />
       {/* <Container>
         <h1 className="text-center text-2xl font-bold">
           Browse the latest listings
         </h1>
       </Container> */}
-      <Container id="about" className="py-20">
-        <h1 className="text-center text-2xl font-bold">Why use UMW Cribs?</h1>
-        <div className="mt-12 grid grid-cols-3 gap-6">
-          <div className="flex flex-col items-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
-              <span className="text-blue-500">
-                <DiamondsFour size={32} />
-              </span>
-            </div>
-            <h2 className="mt-4 text-xl font-bold">
-              All listings in one place
-            </h2>
-            <p className="mt-2 text-center text-gray-500">
-              We aggregate listings from 10+ sites and put them all in one place
-            </p>
-          </div>
-          <div className="flex flex-col items-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
-              <span className="text-blue-500">
-                <Bell size={32} />
-              </span>
-            </div>
-            <h2 className="mt-4 text-xl font-bold">Stay in the loop</h2>
-            <p className="mt-2 text-center text-gray-500">
-              Get instantly notified about new listings and updates
-            </p>
-          </div>
-          <div className="flex flex-col items-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
-              <span className="text-blue-500">
-                <Funnel size={32} />
-              </span>
-            </div>
-            <h2 className="mt-4 text-xl font-bold">Advanced Filters</h2>
-            <p className="mt-2 text-center text-gray-500">
-              Filter listings by price, distance from school, and more
-            </p>
-          </div>
-        </div>
-      </Container>
+      <AboutSection />
       <GetStartedSection />
       <Footer />
     </div>
@@ -109,7 +68,7 @@ const HeroSection = () => {
           <Link to="/listings">
             Start browsing{" "}
             <span className="ml-1.5 text-sky-200">
-              <ArrowUpRight size={18} />
+              <IconArrowUpRight size={18} />
             </span>
           </Link>
         </Button>
@@ -117,7 +76,7 @@ const HeroSection = () => {
           <a href="#about">
             Learn more
             <span className="ml-1.5 text-gray-500">
-              <ArrowURightDown size={18} />
+              <IconCornerRightDown size={18} />
             </span>
           </a>
         </Button>
@@ -127,8 +86,52 @@ const HeroSection = () => {
           src={HouseIllustration}
           alt="House Illustration"
           width={420}
+          height={343}
           draggable={false}
         />
+      </div>
+    </Container>
+  )
+}
+
+const AboutSection = () => {
+  return (
+    <Container id="about" className="py-20">
+      <h1 className="text-center text-2xl font-bold">Why use UMW Cribs?</h1>
+      <div className="mt-12 grid grid-cols-3 gap-6">
+        <div className="flex flex-col items-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
+            <span className="text-blue-500">
+              <IconLayoutGrid size={32} />
+            </span>
+          </div>
+          <h2 className="mt-4 text-xl font-bold">All listings in one place</h2>
+          <p className="mt-2 text-center text-gray-500">
+            We aggregate listings from 10+ sites and put them all in one place
+          </p>
+        </div>
+        <div className="flex flex-col items-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
+            <span className="text-blue-500">
+              <IconBellCheck size={32} />
+            </span>
+          </div>
+          <h2 className="mt-4 text-xl font-bold">Stay in the loop</h2>
+          <p className="mt-2 text-center text-gray-500">
+            Get instantly notified about new listings and updates
+          </p>
+        </div>
+        <div className="flex flex-col items-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
+            <span className="text-blue-500">
+              <IconFilter size={32} />
+            </span>
+          </div>
+          <h2 className="mt-4 text-xl font-bold">Advanced Filters</h2>
+          <p className="mt-2 text-center text-gray-500">
+            Filter listings by price, distance from school, and more
+          </p>
+        </div>
       </div>
     </Container>
   )
@@ -151,7 +154,7 @@ const GetStartedSection = () => {
             <Link to="/listings">
               Start browsing{" "}
               <span className="ml-1.5 text-sky-200">
-                <ArrowUpRight size={18} />
+                <IconArrowUpRight size={18} />
               </span>
             </Link>
           </Button>
@@ -159,7 +162,7 @@ const GetStartedSection = () => {
             <Link to="/signup">
               Sign up{" "}
               <span className="ml-1.5 text-gray-500">
-                <ArrowRight size={18} />
+                <IconArrowRight size={18} />
               </span>
             </Link>
           </Button>

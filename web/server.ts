@@ -10,8 +10,7 @@ import { drizzle } from "drizzle-orm/planetscale-serverless"
 import type { TypesafeEnv } from "@/app"
 import {
   createAuthenticator,
-  createGoogleAuthenticator,
-  createPasswordResetTokenHandler,
+  createGoogleAuthenticator, // createPasswordResetTokenHandler,
 } from "@/lib/auth.server"
 import { createDbConnection } from "@/lib/db.server"
 import { createOauthSessionStorage } from "@/lib/oauth-session.server"
@@ -59,7 +58,7 @@ export default {
         env,
         db: drizzle(dbConnection),
         auth,
-        passwordResetToken: createPasswordResetTokenHandler(auth),
+        // passwordResetToken: createPasswordResetTokenHandler(auth),
         googleAuth: createGoogleAuthenticator(
           auth,
           env.GOOGLE_CLIENT_ID,

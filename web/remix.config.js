@@ -13,9 +13,9 @@ export default {
   serverConditions: ["worker"],
   serverDependenciesToBundle: [
     "lucia",
-    "lucia-auth/middleware",
-    "@lucia-auth/adapter-prisma",
-    "lucia-auth/polyfill/node",
+    "lucia/middleware",
+    "@lucia-auth/adapter-mysql",
+    "lucia/polyfill/node",
     "@lucia-auth/oauth",
     "@lucia-auth/oauth/providers",
     "@umw-cribs/db/schema.server",

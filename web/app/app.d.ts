@@ -1,22 +1,10 @@
 import type { PlanetScaleDatabase } from "drizzle-orm/planetscale-serverless"
 import type {
   Authenticator,
-  GoogleAuthenticator,
-  PasswordResetTokenHandler,
+  GoogleAuthenticator, // PasswordResetTokenHandler,
 } from "@/lib/auth.server"
 import { OAuthSessionStorage } from "./lib/oauth-session.server"
 import { SessionStorage } from "./lib/session.server"
-
-/// <reference types="lucia-auth" />
-declare namespace Lucia {
-  type Auth = import("@/lib/auth.server").Authenticator
-  type UserAttributes = {
-    email: string
-    emailVerifiedAt?: string | null
-    createdAt?: string
-    avatar?: string | null
-  }
-}
 
 export type TypesafeEnv = {
   __STATIC_CONTENT: Fetcher
@@ -36,7 +24,7 @@ declare module "@remix-run/cloudflare" {
     env: TypesafeEnv
     db: PlanetScaleDatabase<Record<string, never>>
     auth: Authenticator
-    passwordResetToken: PasswordResetTokenHandler
+    // passwordResetToken: PasswordResetTokenHandler
     googleAuth: GoogleAuthenticator
     is_dev: boolean
     session: SessionStorage

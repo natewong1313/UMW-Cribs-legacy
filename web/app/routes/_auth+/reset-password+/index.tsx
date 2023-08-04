@@ -38,21 +38,21 @@ export async function action({ request, context }: ActionArgs) {
       { status: 400 }
     )
   }
-  const user = context.auth.transformDatabaseUser(foundUsers[0])
-  const resetToken = await context.passwordResetToken.issue(user.userId)
-  await sendPasswordResetLinkEmail(
-    user.email,
-    resetToken.toString(),
-    context.env
-  )
-  const session = await context.session.get(request.headers.get("Cookie"))
-  session.flash(
-    "message",
-    "Please check your email for the link to reset your password"
-  )
+  // const user = context.auth.transformDatabaseUser(foundUsers[0])
+  // const resetToken = await context.passwordResetToken.issue(user.userId)
+  // await sendPasswordResetLinkEmail(
+  //   user.email,
+  //   resetToken.toString(),
+  //   context.env
+  // )
+  // const session = await context.session.get(request.headers.get("Cookie"))
+  // session.flash(
+  //   "message",
+  //   "Please check your email for the link to reset your password"
+  // )
   return json(submission, {
     headers: {
-      "Set-Cookie": await context.session.commit(session),
+      // "Set-Cookie": await context.session.commit(session),
     },
   })
 }

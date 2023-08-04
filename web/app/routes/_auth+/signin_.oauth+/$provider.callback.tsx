@@ -1,5 +1,5 @@
 import { type LoaderArgs, redirect } from "@remix-run/cloudflare"
-import { LuciaError } from "lucia-auth"
+import { LuciaError } from "lucia"
 
 export async function loader({ request, context }: LoaderArgs) {
   const url = new URL(request.url)
@@ -10,29 +10,34 @@ export async function loader({ request, context }: LoaderArgs) {
   )
   const storedState = oauthSession.get("state")
   const refererPath = oauthSession.get("referer") as string
-  console.log("Recieved", code, state, storedState, refererPath)
   if (!storedState || storedState !== state || !code || !state) {
     return new Response(null, { status: 401 })
   }
 
   try {
-    const { existingUser, providerUser, createUser } =
+    const { existingUser, googleUser, createUser } =
       await context.googleAuth.validateCallback(code)
 
     const getUser = async () => {
       if (existingUser) return existingUser
       // create a new user if the user does not exist
       return await createUser({
-        email: providerUser.email,
-        avatar: providerUser.picture,
+        attributes: {
+          email: googleUser.email,
+          firstName: googleUser.given_name,
+          lastName: googleUser.family_name,
+        },
       })
     }
     const user = await getUser()
-    const session = await context.auth.createSession(user.userId)
-    const headers = new Headers()
-    const authRequest = context.auth.handleRequest(request, headers)
-    authRequest.setSession(session)
-    return redirect("/", { headers })
+    const authSession = await context.auth.createSession({
+      userId: user.userId,
+      attributes: {},
+    })
+    const sessionCookie = context.auth.createSessionCookie(authSession)
+    return redirect("/", {
+      headers: { "Set-Cookie": sessionCookie.serialize() },
+    })
   } catch (e) {
     const session = await context.session.get(request.headers.get("Cookie"))
     const errorMessage =

@@ -25,6 +25,8 @@ export async function loader({ request, context }: LoaderArgs) {
 }
 
 const schema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
   email: z.string().min(1, "Email is required").email(),
   password: z
     .string()
@@ -51,25 +53,31 @@ export async function action({ request, context }: ActionArgs) {
   if (!submission.value || submission.intent !== "submit") {
     return json(baseResponse, { status: 400 })
   }
-  const headers = new Headers()
   try {
     const user = await context.auth.createUser({
-      primaryKey: {
+      key: {
         providerId: "email",
         providerUserId: submission.value.email,
         password: submission.value.password,
       },
       attributes: {
         email: submission.value.email,
+        firstName: submission.value.firstName,
+        lastName: submission.value.lastName,
       },
     })
-    const authSession = await context.auth.createSession(user.userId)
-    const authRequest = context.auth.handleRequest(request, headers)
-    authRequest.setSession(authSession)
-    return redirect("/", { headers })
+    const authSession = await context.auth.createSession({
+      userId: user.userId,
+      attributes: {},
+    })
+    const sessionCookie = context.auth.createSessionCookie(authSession)
+    return redirect("/", {
+      headers: { "Set-Cookie": sessionCookie.serialize() },
+    })
   } catch (e) {
+    console.log(e)
     const { error, status } = handleAuthError(e)
-    return json({ ...baseResponse, error }, { status, headers })
+    return json({ ...baseResponse, error }, { status })
   }
 }
 
@@ -77,7 +85,9 @@ export default function SignupPage() {
   const navigation = useNavigation()
   const { message } = useLoaderData<typeof loader>()
   const lastSubmission = useActionData<typeof action>()
-  const [form, { email, password }] = useForm<z.input<typeof schema>>({
+  const [form, { firstName, lastName, email, password }] = useForm<
+    z.input<typeof schema>
+  >({
     lastSubmission,
     onValidate: ({ formData }) => parse(formData, { schema }),
   })
@@ -88,6 +98,22 @@ export default function SignupPage() {
         {message && handleAuthError(message).errorMessage}
       </div>
       <Form method="post" className="flex flex-col p-2" {...form.props}>
+        <label>
+          First name
+          <input
+            type="text"
+            className="ring-1 ring-gray-500"
+            {...conform.input(firstName)}
+          />
+        </label>
+        <label>
+          Last name
+          <input
+            type="text"
+            className="ring-1 ring-gray-500"
+            {...conform.input(lastName)}
+          />
+        </label>
         <label>
           Email
           <input

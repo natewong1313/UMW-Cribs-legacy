@@ -1,40 +1,49 @@
 import { planetscale } from "@lucia-auth/adapter-mysql"
 import { google } from "@lucia-auth/oauth/providers"
-import { idToken } from "@lucia-auth/tokens"
+// import { idToken } from "@lucia-auth/tokens"
 import type { Connection } from "@planetscale/database"
-import lucia from "lucia-auth"
-import { web } from "lucia-auth/middleware"
+import { lucia } from "lucia"
+import { web } from "lucia/middleware"
 
 export const createAuthenticator = (
   dbConnection: Connection,
   isDev: boolean
 ) => {
   return lucia({
-    // @ts-ignore
-    adapter: planetscale(dbConnection),
+    adapter: planetscale(dbConnection, {
+      user: "auth_user",
+      key: "auth_key",
+      session: "auth_session",
+    }),
     env: isDev ? "DEV" : "PROD",
     middleware: web(),
-    transformDatabaseUser: (userData) => {
+    sessionCookie: {
+      expires: false,
+    },
+    getUserAttributes: (data) => {
       return {
-        userId: userData.id,
-        email: userData.email,
-        emailVerifiedAt: userData.emailVerifiedAt,
-        createdAt: userData.createdAt,
-        avatar: userData.avatar,
+        // IMPORTANT!!!!
+        // `userId` included by default!!
+        email: data.email,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        emailVerifiedAt: data.emailVerifiedAt,
+        createdAt: data.createdAt,
+        avatar: data.avatar,
       }
     },
   })
 }
 export type Authenticator = ReturnType<typeof createAuthenticator>
 
-export const createPasswordResetTokenHandler = (auth: Authenticator) =>
-  // @ts-ignore
-  idToken(auth, "password-reset", {
-    expiresIn: 60 * 60,
-  })
-export type PasswordResetTokenHandler = ReturnType<
-  typeof createPasswordResetTokenHandler
->
+// export const createPasswordResetTokenHandler = (auth: Authenticator) =>
+//   // @ts-ignore
+//   idToken(auth, "password-reset", {
+//     expiresIn: 60 * 60,
+//   })
+// export type PasswordResetTokenHandler = ReturnType<
+//   typeof createPasswordResetTokenHandler
+// >
 
 export const createGoogleAuthenticator = (
   auth: Authenticator,

@@ -32,25 +32,26 @@ export async function action({ request, params, context }: ActionArgs) {
   if (!submission.value || submission.intent !== "submit") {
     return json(baseResponse, { status: 400 })
   }
-  const headers = new Headers()
-  const authRequest = context.auth.handleRequest(request, headers)
+  return json(baseResponse, { status: 200 })
+  // const headers = new Headers()
+  // const authRequest = context.auth.handleRequest(request, headers)
 
-  try {
-    const token = await context.passwordResetToken.validate(params.token ?? "")
-    const user = await context.auth.getUser(token.userId)
-    await context.auth.invalidateAllUserSessions(user.userId)
-    await context.auth.updateKeyPassword(
-      "email",
-      user.email,
-      submission.value.password
-    )
-    const session = await context.auth.createSession(user.userId)
-    authRequest.setSession(session)
-    return redirect("/", { headers })
-  } catch (e) {
-    const { error, status } = handleAuthError(e)
-    return json({ ...baseResponse, error }, { status, headers })
-  }
+  // try {
+  //   const token = await context.passwordResetToken.validate(params.token ?? "")
+  //   const user = await context.auth.getUser(token.userId)
+  //   await context.auth.invalidateAllUserSessions(user.userId)
+  //   await context.auth.updateKeyPassword(
+  //     "email",
+  //     user.email,
+  //     submission.value.password
+  //   )
+  //   const session = await context.auth.createSession(user.userId)
+  //   authRequest.setSession(session)
+  //   return redirect("/", { headers })
+  // } catch (e) {
+  //   const { error, status } = handleAuthError(e)
+  //   return json({ ...baseResponse, error }, { status, headers })
+  // }
 }
 
 export default function ChangePasswordPage() {

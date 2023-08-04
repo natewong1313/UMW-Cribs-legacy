@@ -36,17 +36,20 @@ export async function action({ request, context }: ActionArgs) {
     return json(baseResponse, { status: 400 })
   }
 
-  const headers = new Headers()
   try {
-    const key = await context.auth.useKey(
+    const user = await context.auth.useKey(
       "email",
       submission.value.email,
       submission.value.password
     )
-    const authSession = await context.auth.createSession(key.userId)
-    const authRequest = context.auth.handleRequest(request, headers)
-    authRequest.setSession(authSession)
-    return redirect("/", { headers })
+    const authSession = await context.auth.createSession({
+      userId: user.userId,
+      attributes: {},
+    })
+    const sessionCookie = context.auth.createSessionCookie(authSession)
+    return redirect("/", {
+      headers: { "Set-Cookie": sessionCookie.serialize() },
+    })
   } catch (e) {
     const { error, status } = handleAuthError(e)
     return json({ ...baseResponse, error }, { status })
