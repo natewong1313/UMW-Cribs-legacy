@@ -13,6 +13,8 @@
   "dependencies": {
     "@conform-to/react": "^0.7.2",
     "@conform-to/zod": "^0.7.2",
+    "@headlessui/react": "^1.7.16",
+    "@headlessui/tailwindcss": "^0.2.0",
     "@lucia-auth/adapter-mysql": "^2.0.0",
     "@lucia-auth/oauth": "^2.0.0",
     "@phosphor-icons/react": "^2.0.10",

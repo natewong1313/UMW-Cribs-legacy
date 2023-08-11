@@ -11,6 +11,7 @@ import { eq, sql } from "drizzle-orm"
 import { useMemo } from "react"
 import Container from "@/components/Container"
 import Navbar from "@/components/Navbar"
+import { Select, SelectOption } from "@/components/ui/Select"
 
 export const loader = async ({ request, context }: LoaderArgs) => {
   const headers = new Headers()
@@ -69,6 +70,10 @@ export default function ListingsPage() {
         <h1 className="mb-8 mt-4 text-center text-2xl font-bold">
           Browse the latest listings
         </h1>
+        <Select placeholder="Filter by">
+          <SelectOption title="Most recent" value="all" />
+          <SelectOption title="Price: Low to high" value="low" />
+        </Select>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
           {listings.map((listing) => (
             <Listing
