@@ -1,67 +1,39 @@
 import { Listbox, Transition } from "@headlessui/react"
-import { Slot } from "@radix-ui/react-slot"
-import { IconCheck, IconChevronDown, IconChevronUp } from "@tabler/icons-react"
-import { cva, type VariantProps } from "class-variance-authority"
-import {
-  forwardRef,
-  type ButtonHTMLAttributes,
-  SelectHTMLAttributes,
-} from "react"
-import { Fragment, useState } from "react"
+import { IconCheck, IconChevronDown } from "@tabler/icons-react"
+import { forwardRef, SelectHTMLAttributes, ReactElement, Fragment } from "react"
 import { cnMerge } from "@/lib/utils"
 import { Button } from "./Button"
 
-// const selectVariants = cva(
-//   "inline-flex items-center border border-transparent justify-center rounded-md font-semibold ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-50",
-//   {
-//     variants: {
-//       variant: {
-//         primary:
-//           "bg-blue-500 font-medium text-white hover:bg-blue-600 active:bg-blue-700 focus-visible:ring-blue-300",
-//         destructive:
-//           "bg-red-500 text-white hover:bg-red-600 active:bg-red-700 focus-visible:ring-red-300",
-//         secondary:
-//           "bg-gray-100 text-gray-950 hover:bg-gray-200 active:bg-gray-300 focus-visible:ring-gray-200",
-//         outline:
-//           "bg-white text-gray-700 border-gray-200 hover:bg-gray-100 active:bg-gray-200 focus-visible:ring-gray-200",
-//         invisible:
-//           "text-gray-700 hover:border-gray-300 active:bg-gray-100 focus-visible:ring-gray-200",
-//       },
-//       size: {
-//         default: "h-10 px-4 py-2",
-//         sm: "h-9 rounded-md px-3",
-//         lg: "h-11 rounded-md px-8",
-//         icon: "h-10 w-10",
-//       },
-//     },
-//     defaultVariants: {
-//       variant: "primary",
-//       size: "default",
-//     },
-//   }
-// )
-
 interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   defaultValue?: string
+  children?: Array<ReactElement<SelectOptionProps>>
+  setValue?: (value: string) => void
 }
 
 const Select = forwardRef<HTMLSelectElement, SelectProps>(
-  ({ placeholder, children, defaultValue }, ref) => {
-    //
-    const [value, setValue] = useState<{ title: string; value: string }>()
+  (
+    { className, placeholder, children, defaultValue, value, setValue },
+    ref
+  ) => {
+    // const [value, setValue] = useState(defaultValue)
+    const titles = children
+      ? children.reduce((acc, child) => {
+          // @ts-ignore
+          acc[child.props.value] = child.props.title
+          return acc
+        }, {})
+      : {}
     return (
-      <Listbox
-        className="w-fit"
-        by="value"
-        value={value}
-        onChange={setValue}
-        defaultValue={defaultValue}
-      >
-        <div className="">
+      <Listbox className="relative" value={value} onChange={setValue}>
+        <div>
           <Listbox.Button as={Fragment}>
-            <Button variant="outline">
-              {value ? value.title : placeholder}
-              <span className="ml-3 text-gray-500">
+            <Button
+              variant="outline"
+              className={cnMerge(!value ? "text-gray-500" : "", className)}
+            >
+              {/* @ts-ignore */}
+              {value && value in titles ? titles[value] : placeholder}
+              <span className="ml-3 text-gray-400">
                 <IconChevronDown size={18} />
               </span>
             </Button>
@@ -71,7 +43,10 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Listbox.Options className="absolute z-10 mt-1 max-h-64 w-max space-y-1 overflow-auto rounded-md bg-white p-1.5 text-sm shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+            <Listbox.Options className="absolute z-10 mt-1 max-h-64 w-full min-w-full space-y-1 overflow-auto rounded-md bg-white p-1.5 text-sm shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+              {placeholder && (
+                <SelectOption title={placeholder} value="" disabled />
+              )}
               {children}
             </Listbox.Options>
           </Transition>
@@ -85,8 +60,9 @@ Select.displayName = "Select"
 type SelectOptionProps = {
   title: string
   value: string
+  disabled?: boolean
 }
-const SelectOption = ({ title, value }: SelectOptionProps) => {
+const SelectOption = ({ title, value, disabled }: SelectOptionProps) => {
   return (
     <Listbox.Option
       key={value}
@@ -94,10 +70,12 @@ const SelectOption = ({ title, value }: SelectOptionProps) => {
         cnMerge(
           active && "bg-gray-100",
           selected && "bg-blue-500 text-white",
-          "ui-selected:pr-8 relative cursor-default select-none rounded-md px-3 py-2"
+          disabled ? "cursor-default text-gray-400" : "cursor-pointer",
+          "ui-selected:pr-8 relative select-none rounded-md px-3 py-2"
         )
       }
-      value={{ title, value }}
+      disabled={disabled}
+      value={value}
     >
       <span className="block truncate">{title}</span>
       <span className="ui-selected:flex ui-selected:pr-2 absolute inset-y-0 right-0 hidden items-center">

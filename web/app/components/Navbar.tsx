@@ -11,7 +11,7 @@ type Props = {
 export default function Navbar({ user }: Props) {
   return (
     <>
-      <div className="fixed z-50 w-full bg-white/80 backdrop-blur">
+      <div className=" z-50 w-full bg-white/80 backdrop-blur">
         <Container className="flex h-20 items-center justify-between">
           <Link to="/" className="flex items-center hover:opacity-90">
             <img
@@ -46,7 +46,7 @@ export default function Navbar({ user }: Props) {
           )}
         </Container>
       </div>
-      <div className="h-20"></div>
+      {/* <div className="h-20"></div> */}
     </>
   )
 }

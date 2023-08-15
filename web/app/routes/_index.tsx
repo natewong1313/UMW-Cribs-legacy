@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/Button"
 
 export const meta: V2_MetaFunction = () => {
   return [
-    { title: "New Remix App" },
+    { title: "UMW Cribs" },
     { name: "description", content: "Welcome to Remix!" },
   ]
 }
@@ -48,7 +48,7 @@ export default function Index() {
 
 const HeroSection = () => {
   return (
-    <Container className="grid grid-cols-2 pb-36 pt-20">
+    <Container className="grid pb-36 pt-20 sm:grid-cols-2">
       <div className="pt-8">
         <h1 className="text-6xl font-extrabold leading-tight">
           Find the{" "}
@@ -81,7 +81,7 @@ const HeroSection = () => {
           </a>
         </Button>
       </div>
-      <div className="flex justify-center">
+      <div className="hidden justify-center sm:flex">
         <img
           src={HouseIllustration}
           alt="House Illustration"
