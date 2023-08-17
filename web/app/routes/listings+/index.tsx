@@ -118,23 +118,40 @@ export default function ListingsPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const sortBy = searchParams.get("sortBy") ?? "mostRecent"
   const [filtersModalOpen, setFiltersModalOpen] = useState(false)
-  const bedrooms = searchParams.get("bedrooms") ?? ""
-  const bathrooms = searchParams.get("bathrooms") ?? ""
-  const minPrice = searchParams.get("minPrice") ?? ""
-  const maxPrice = searchParams.get("maxPrice") ?? ""
-  const addSearchParam = (key: string, value: string) => {
+  const [filtersFormDirty, setFiltersFormDirty] = useState(false)
+  const [numOfBedrooms, setNumOfBedrooms] = useState(
+    searchParams.get("bedrooms") ?? ""
+  )
+  const [numOfBathrooms, setNumOfBathrooms] = useState(
+    searchParams.get("bathrooms") ?? ""
+  )
+  const [minPrice, setMinPrice] = useState(searchParams.get("minPrice") ?? "")
+  const [maxPrice, setMaxPrice] = useState(searchParams.get("maxPrice") ?? "")
+  const applyFilters = (e: React.FormEvent) => {
+    e.preventDefault()
     const params = new URLSearchParams(searchParams)
-    params.set(key, value)
+    params.set("bedrooms", numOfBedrooms)
+    if (numOfBedrooms === "") params.delete("bedrooms")
+    params.set("bathrooms", numOfBathrooms)
+    if (numOfBathrooms === "") params.delete("bathrooms")
+    params.set("minPrice", minPrice)
+    if (minPrice === "") params.delete("minPrice")
+    params.set("maxPrice", maxPrice)
+    if (maxPrice === "") params.delete("maxPrice")
     setSearchParams(params)
+    setFiltersModalOpen(false)
+    setFiltersFormDirty(false)
   }
   return (
     <div>
       <Navbar user={user} />
       <Container>
         <div className="flex items-center justify-between pb-3">
-          <h1 className="text-2xl font-bold">Browse Listings</h1>
-          <div className="flex items-center space-x-2">
-            <div className="hidden sm:block">
+          <h1 className="hidden text-2xl font-bold sm:block">
+            Browse Listings
+          </h1>
+          <div className="flex items-center sm:justify-end">
+            <div className=" sm:block">
               <Button
                 variant="outline"
                 onClick={() => setFiltersModalOpen(true)}
@@ -145,7 +162,7 @@ export default function ListingsPage() {
                 Adjust filters
               </Button>
             </div>
-            <div className="sm:hidden">
+            {/* <div className="sm:hidden">
               <Button
                 variant="outline"
                 size="icon"
@@ -155,8 +172,8 @@ export default function ListingsPage() {
                   <IconAdjustments size={18} />
                 </span>
               </Button>
-            </div>
-            <div className="flex items-center">
+            </div> */}
+            <div className="ml-2 flex items-center">
               <Select
                 placeholder="Sort by"
                 className="ml-auto"
@@ -188,57 +205,46 @@ export default function ListingsPage() {
           </div>
           <div className="col-span-3 h-full">
             <ClientOnly fallback={<div style={{ height: "400px" }} />}>
-              {() => <MapView />}
+              {/* @ts-ignore */}
+              {() => <MapView listings={listings} />}
             </ClientOnly>
           </div>
         </div>
-        {/* <div className="">
-          <div className="grid w-[65%] grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-            {listings.map((listing) => (
-              <Listing
-                key={listing.id}
-                //@ts-ignore
-                listing={listing}
-                likedListingIds={likedListingIds}
-              />
-            ))}
-          </div>
-          <div className="fixed top-0 float-right h-full w-96">
-            <ClientOnly fallback={<div style={{ height: "400px" }} />}>
-              {() => <MapView />}
-            </ClientOnly>
-          </div>
-        </div> */}
       </Container>
-      {/* horizontally centered absolute div */}
-      {/* <div className="absolute inset-x-0 bottom-0 flex justify-center pb-3">
-        <div className="rounded-full bg-white px-4 py-2">
-          <p>Toggle map view</p>
-        </div>
-      </div> */}
-
       <Modal
         isOpen={filtersModalOpen}
         setIsOpen={setFiltersModalOpen}
         title="Filters"
       >
-        <div className="mt-3 flex flex-col divide-y divide-gray-200">
+        <form
+          className="mt-3 flex flex-col divide-y divide-gray-200"
+          onSubmit={applyFilters}
+          onChange={() => setFiltersFormDirty(true)}
+        >
           <div className="flex flex-col">
             <h1 className="font-medium">Number of Bedrooms</h1>
             <ButtonGroup
               className="mt-2"
-              options={["1", "2", "3", "4", "5+"]}
-              value={bedrooms}
-              setValue={(value) => addSearchParam("bedrooms", value)}
+              defaultLabel="Any"
+              options={["", "1", "2", "3", "4", "5+"]}
+              value={numOfBedrooms}
+              setValue={(value) => {
+                setNumOfBedrooms(value)
+                setFiltersFormDirty(true)
+              }}
             />
           </div>
           <div className="mt-3 flex flex-col pt-2">
             <h1 className="font-medium">Number of Bathrooms</h1>
             <ButtonGroup
               className="mt-2"
-              options={["1", "1.5", "2", "2.5", "3+"]}
-              value={bathrooms}
-              setValue={(value) => addSearchParam("bathrooms", value)}
+              defaultLabel="Any"
+              options={["", "1", "1.5", "2", "2.5", "3+"]}
+              value={numOfBathrooms}
+              setValue={(value) => {
+                setNumOfBathrooms(value)
+                setFiltersFormDirty(true)
+              }}
             />
           </div>
           <div className="mt-3 flex flex-col pt-2">
@@ -249,7 +255,7 @@ export default function ListingsPage() {
                 placeholder="Min price"
                 className="w-32"
                 value={minPrice}
-                onChange={(e) => addSearchParam("minPrice", e.target.value)}
+                onChange={(e) => setMinPrice(e.target.value)}
                 icon={<IconCurrencyDollar size={18} />}
               />
               <span className="text-gray-400">-</span>
@@ -258,12 +264,17 @@ export default function ListingsPage() {
                 placeholder="Max price"
                 className="w-32"
                 value={maxPrice}
-                onChange={(e) => addSearchParam("maxPrice", e.target.value)}
+                onChange={(e) => setMaxPrice(e.target.value)}
                 icon={<IconCurrencyDollar size={18} />}
               />
             </div>
           </div>
-        </div>
+          <div className="mt-3 pt-2">
+            <Button className="mt-2 w-full" disabled={!filtersFormDirty}>
+              Apply filters
+            </Button>
+          </div>
+        </form>
       </Modal>
     </div>
   )

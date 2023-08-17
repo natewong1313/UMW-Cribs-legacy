@@ -43,7 +43,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Listbox.Options className="absolute z-10 mt-1 max-h-64 w-full min-w-full space-y-1 overflow-auto rounded-md bg-white p-1.5 text-sm shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+            <Listbox.Options className="absolute z-20 mt-1 max-h-64 w-full min-w-full space-y-1 overflow-auto rounded-md bg-white p-1.5 text-sm shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
               {placeholder && (
                 <SelectOption title={placeholder} value="" disabled />
               )}

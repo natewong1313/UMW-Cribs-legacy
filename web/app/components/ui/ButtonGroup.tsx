@@ -2,6 +2,7 @@ import { cnMerge } from "@/lib/utils"
 
 type Props = {
   className?: string
+  defaultLabel?: string
   options: string[]
   value?: string
   setValue?: (value: string) => void
@@ -9,6 +10,7 @@ type Props = {
 
 export default function ButtonGroup({
   className,
+  defaultLabel,
   options,
   value,
   setValue,
@@ -18,6 +20,7 @@ export default function ButtonGroup({
       {options.map((option) => (
         <button
           key={option}
+          type="button"
           className={cnMerge(
             "rounded-md border bg-white px-4 py-2 text-sm font-medium text-gray-700",
             value === option
@@ -27,9 +30,10 @@ export default function ButtonGroup({
           )}
           onClick={() => setValue && setValue(option)}
         >
-          {option}
+          {option === "" && defaultLabel ? defaultLabel : option}
         </button>
       ))}
+      <input type="hidden" value={value} />
     </div>
   )
 }

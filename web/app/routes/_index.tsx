@@ -48,7 +48,7 @@ export default function Index() {
 
 const HeroSection = () => {
   return (
-    <Container className="grid pb-36 pt-20 sm:grid-cols-2">
+    <Container className="grid pb-36 pt-10 sm:grid-cols-2 sm:pt-20">
       <div className="pt-8">
         <h1 className="text-6xl font-extrabold leading-tight">
           Find the{" "}

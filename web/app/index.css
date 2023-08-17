@@ -6,5 +6,11 @@
 }
 .leaflet-top,
 .leaflet-bottom {
-  z-index: 20 !important;
+  z-index: 15 !important;
+}
+.leaflet-container {
+  font-family: Manrope !important;
+}
+.leaflet-popup-content p {
+  margin: 0 !important;
 }
