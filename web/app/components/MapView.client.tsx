@@ -24,7 +24,6 @@ export default function MapView({ listings }: Props) {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         {listings.map((listing) => {
-          //svg rectangular blue badge with large white text that has listing price
           const icon = `data:image/svg+xml;utf8,${encodeURIComponent(`<?xml version="1.0" encoding="iso-8859-1"?>
           <svg viewBox="-1.513 14.372 500 500" xmlns="http://www.w3.org/2000/svg">
   <defs></defs>

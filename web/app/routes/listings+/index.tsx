@@ -34,6 +34,7 @@ import ButtonGroup from "@/components/ui/ButtonGroup"
 import { Input } from "@/components/ui/Input"
 import Modal from "@/components/ui/Modal"
 import { Select, SelectOption } from "@/components/ui/Select"
+import { cnMerge } from "@/lib/utils"
 
 export const meta: V2_MetaFunction = () => {
   return [
@@ -63,9 +64,30 @@ export const loader = async ({ request, context }: LoaderArgs) => {
     default:
       break
   }
+  let whereStatement
+  const numOfBedrooms = url.searchParams.get("bedrooms")
+  if (numOfBedrooms) {
+    whereStatement = sql`${dbListing.bedrooms} = ${numOfBedrooms}`
+  }
+  const numOfBathrooms = url.searchParams.get("bathrooms")
+  if (numOfBathrooms) {
+    if (whereStatement) whereStatement = sql`${whereStatement} and `
+    whereStatement = sql`${whereStatement}${dbListing.bathrooms} = ${numOfBathrooms}`
+  }
+  const minPrice = url.searchParams.get("minPrice")
+  if (minPrice) {
+    if (whereStatement) whereStatement = sql`${whereStatement} and `
+    whereStatement = sql`${whereStatement}${dbListing.price} >= ${minPrice}`
+  }
+  const maxPrice = url.searchParams.get("maxPrice")
+  if (maxPrice) {
+    if (whereStatement) whereStatement = sql`${whereStatement} and `
+    whereStatement = sql`${whereStatement}${dbListing.price} <= ${maxPrice}`
+  }
   const listings = await context.db
     .select()
     .from(dbListing)
+    .where(whereStatement)
     .orderBy(orderByStatement)
 
   const authRequest = context.auth.handleRequest(request)
@@ -142,27 +164,51 @@ export default function ListingsPage() {
     setFiltersModalOpen(false)
     setFiltersFormDirty(false)
   }
+  const numberOfFiltersApplied = useMemo(() => {
+    let amount = 0
+    if (searchParams.get("bedrooms")) amount++
+    if (searchParams.get("bathrooms")) amount++
+    if (searchParams.get("minPrice")) amount++
+    if (searchParams.get("maxPrice")) amount++
+    return amount
+  }, [searchParams])
   return (
     <div>
       <Navbar user={user} />
       <Container>
         <div className="flex items-center justify-between pb-3">
-          <h1 className="hidden text-2xl font-bold sm:block">
-            Browse Listings
-          </h1>
+          <div>
+            <h1 className="hidden text-2xl font-bold sm:block">
+              Browse Listings
+            </h1>
+            <div className="sm:hidden">Map view</div>
+          </div>
           <div className="flex items-center sm:justify-end">
-            <div className=" sm:block">
+            <div className="hidden sm:block">
               <Button
                 variant="outline"
                 onClick={() => setFiltersModalOpen(true)}
+                className={
+                  numberOfFiltersApplied > 0
+                    ? "border-blue-300 bg-blue-50 text-blue-500 hover:bg-blue-100 active:bg-blue-100"
+                    : ""
+                }
               >
-                <span className="mr-1.5 text-gray-400">
+                <span
+                  className={cnMerge(
+                    "mr-1.5",
+                    numberOfFiltersApplied > 0
+                      ? "text-blue-500"
+                      : " text-gray-400"
+                  )}
+                >
                   <IconAdjustments size={18} />
                 </span>
-                Adjust filters
+                Adjust filters{" "}
+                {numberOfFiltersApplied > 0 && `(${numberOfFiltersApplied})`}
               </Button>
             </div>
-            {/* <div className="sm:hidden">
+            <div className="sm:hidden">
               <Button
                 variant="outline"
                 size="icon"
@@ -172,15 +218,17 @@ export default function ListingsPage() {
                   <IconAdjustments size={18} />
                 </span>
               </Button>
-            </div> */}
+            </div>
             <div className="ml-2 flex items-center">
               <Select
                 placeholder="Sort by"
                 className="ml-auto"
                 value={sortBy}
-                setValue={(value) =>
-                  setSearchParams({ ...searchParams, sortBy: value })
-                }
+                setValue={(value) => {
+                  const params = new URLSearchParams(searchParams)
+                  params.set("sortBy", value)
+                  setSearchParams(params)
+                }}
               >
                 <SelectOption title="Most recent" value="mostRecent" />
                 <SelectOption title="Price: Low to high" value="lowToHigh" />
@@ -307,9 +355,18 @@ const Listing = ({ listing, likedListingIds }: ListingProps) => {
     })
     revalidator.revalidate()
   }
+  // const isNew = useMemo(() => {
+  //   // check if last update at was less than a day ago
+  //   const lastUpdatedAt = new Date(listing.lastUpdatedAt)
+  //   const now = new Date()
+  //   const diff = now.getTime() - lastUpdatedAt.getTime()
+  //   const diffInDays = diff / (1000 * 3600 * 24)
+  //   console.log(listing.lastUpdatedAt)
+  //   return diffInDays < 1
+  // }, [listing.lastUpdatedAt])
   return (
     <Link to={"/listings/" + listing.id} className="group w-fit">
-      <div className="aspect-[4/3] w-full overflow-hidden rounded-lg">
+      <div className="relative flex aspect-[4/3] w-full overflow-hidden rounded-lg">
         <img
           src={imageUrl}
           alt={listing.addressLineOne}
@@ -317,10 +374,17 @@ const Listing = ({ listing, likedListingIds }: ListingProps) => {
           height={0}
           className="object-fit h-full w-full"
         />
+        {/* {isNew && (
+          <div className="absolute ml-1 mt-1">
+            <div className="w-fit rounded-md bg-blue-500 px-2 py-1 text-sm text-white">
+              New
+            </div>
+          </div>
+        )} */}
       </div>
       <div className="py-2">
-        <div className="flex justify-end">
-          {/* {isLiked ? (
+        <div className="relative flex justify-end">
+          {isLiked ? (
             <button
               className="absolute z-10 text-blue-500"
               onClick={(e) => {
@@ -340,7 +404,7 @@ const Listing = ({ listing, likedListingIds }: ListingProps) => {
             >
               <IconBookmark size={24} />
             </button>
-          )} */}
+          )}
         </div>
         <h1 className="text-xl font-semibold">
           ${listing.price}{" "}
