@@ -1,3 +1,4 @@
+import { Popover, Transition } from "@headlessui/react"
 import { Link } from "@remix-run/react"
 import type { GlobalDatabaseUserAttributes } from "lucia"
 import HouseLogo from "@/assets/house_logo.png"
@@ -46,7 +47,6 @@ export default function Navbar({ user }: Props) {
           )}
         </Container>
       </div>
-      {/* <div className="h-20"></div> */}
     </>
   )
 }

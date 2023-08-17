@@ -1,5 +1,5 @@
 import { json, redirect, type LoaderArgs } from "@remix-run/cloudflare"
-import { Link, useLoaderData } from "@remix-run/react"
+import { useLoaderData } from "@remix-run/react"
 import { listing as dbListing } from "@umw-cribs/db/schema.server"
 import { eq } from "drizzle-orm"
 

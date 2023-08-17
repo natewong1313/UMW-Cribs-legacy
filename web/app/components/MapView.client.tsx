@@ -1,17 +1,14 @@
 // import "leaflet-defaulticon-compatibility"
 // import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css"
-import { Link } from "@remix-run/react"
 import { Listing } from "@umw-cribs/db/schema.server"
 import { Icon } from "leaflet"
 import "leaflet/dist/leaflet.css"
-import { MapContainer, TileLayer, useMap, Marker, Popup } from "react-leaflet"
-import { Button } from "./ui/Button"
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet"
 
 type Props = {
   listings: Listing[]
 }
 export default function MapView({ listings }: Props) {
-  console.log(listings)
   return (
     <div className="h-full w-full overflow-hidden rounded-lg">
       <MapContainer

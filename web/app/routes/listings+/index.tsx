@@ -177,38 +177,33 @@ export default function ListingsPage() {
       <Navbar user={user} />
       <Container>
         <div className="flex items-center justify-between pb-3">
-          <div>
-            <h1 className="hidden text-2xl font-bold sm:block">
-              Browse Listings
-            </h1>
-            <div className="sm:hidden">Map view</div>
+          <div className="hidden sm:block">
+            <h1 className="text-2xl font-bold sm:block">Browse Listings</h1>
           </div>
-          <div className="flex items-center sm:justify-end">
-            <div className="hidden sm:block">
-              <Button
-                variant="outline"
-                onClick={() => setFiltersModalOpen(true)}
-                className={
+          <div className="grid w-full grid-cols-2 items-center gap-2 sm:flex sm:w-fit sm:justify-end">
+            <Button
+              variant="outline"
+              onClick={() => setFiltersModalOpen(true)}
+              className={
+                numberOfFiltersApplied > 0
+                  ? "border-blue-300 bg-blue-50 text-blue-500 hover:bg-blue-100 active:bg-blue-100"
+                  : ""
+              }
+            >
+              <span
+                className={cnMerge(
+                  "mr-1.5",
                   numberOfFiltersApplied > 0
-                    ? "border-blue-300 bg-blue-50 text-blue-500 hover:bg-blue-100 active:bg-blue-100"
-                    : ""
-                }
+                    ? "text-blue-500"
+                    : " text-gray-400"
+                )}
               >
-                <span
-                  className={cnMerge(
-                    "mr-1.5",
-                    numberOfFiltersApplied > 0
-                      ? "text-blue-500"
-                      : " text-gray-400"
-                  )}
-                >
-                  <IconAdjustments size={18} />
-                </span>
-                Adjust filters{" "}
-                {numberOfFiltersApplied > 0 && `(${numberOfFiltersApplied})`}
-              </Button>
-            </div>
-            <div className="sm:hidden">
+                <IconAdjustments size={18} />
+              </span>
+              Adjust filters{" "}
+              {numberOfFiltersApplied > 0 && `(${numberOfFiltersApplied})`}
+            </Button>
+            {/* <div className="sm:hidden">
               <Button
                 variant="outline"
                 size="icon"
@@ -218,26 +213,33 @@ export default function ListingsPage() {
                   <IconAdjustments size={18} />
                 </span>
               </Button>
-            </div>
-            <div className="ml-2 flex items-center">
-              <Select
-                placeholder="Sort by"
-                className="ml-auto"
-                value={sortBy}
-                setValue={(value) => {
-                  const params = new URLSearchParams(searchParams)
-                  params.set("sortBy", value)
-                  setSearchParams(params)
-                }}
-              >
-                <SelectOption title="Most recent" value="mostRecent" />
-                <SelectOption title="Price: Low to high" value="lowToHigh" />
-                <SelectOption title="Price: High to low" value="highToLow" />
-              </Select>
-            </div>
+            </div> */}
+            {/* <Select
+              placeholder="Select view"
+              value={view}
+              setValue={(value) => setView(value)}
+              className="sm:hidden"
+            >
+              <SelectOption title="Listings view" value="listingsView" />
+              <SelectOption title="Map view" value="mapView" />
+            </Select> */}
+            <Select
+              placeholder="Sort by"
+              className="w-full sm:w-fit"
+              value={sortBy}
+              setValue={(value) => {
+                const params = new URLSearchParams(searchParams)
+                params.set("sortBy", value)
+                setSearchParams(params)
+              }}
+            >
+              <SelectOption title="Most recent" value="mostRecent" />
+              <SelectOption title="Price: Low to high" value="lowToHigh" />
+              <SelectOption title="Price: High to low" value="highToLow" />
+            </Select>
           </div>
         </div>
-        <div className="grid grid-cols-7 gap-2">
+        <div className="grid gap-2 sm:grid-cols-7">
           <div
             className="col-span-4 grid grid-cols-1 gap-4 overflow-y-scroll sm:grid-cols-2 md:grid-cols-3"
             style={{ height: "calc(100vh - 164px)" }}
@@ -251,7 +253,7 @@ export default function ListingsPage() {
               />
             ))}
           </div>
-          <div className="col-span-3 h-full">
+          <div className="col-span-3 hidden h-full sm:block">
             <ClientOnly fallback={<div style={{ height: "400px" }} />}>
               {/* @ts-ignore */}
               {() => <MapView listings={listings} />}
