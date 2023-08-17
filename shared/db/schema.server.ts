@@ -2,6 +2,7 @@ import { sql, type InferModel } from "drizzle-orm"
 import {
   mysqlTable,
   bigint,
+  double,
   boolean,
   varchar,
   timestamp,
@@ -56,8 +57,8 @@ export const listing = mysqlTable("listing", {
   city: varchar("city", { length: 255 }).notNull(),
   state: varchar("state", { length: 255 }).notNull(),
   zip: bigint("zip", { mode: "number" }).notNull(),
-  latitude: bigint("latitude", { mode: "number" }).notNull(),
-  longitude: bigint("longitude", { mode: "number" }).notNull(),
+  latitude: double("latitude", { precision: 7, scale: 4 }).notNull(),
+  longitude: double("longitude", { precision: 7, scale: 4 }).notNull(),
   availabilityDate: timestamp("availability_date", { fsp: 2 }).notNull(),
   lastUpdatedAt: timestamp("last_updated_at", { fsp: 2 }).notNull(),
   listingUrl: varchar("listing_url", { length: 255 }).notNull(),

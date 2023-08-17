@@ -7,14 +7,14 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react"
-import tailwindCss from "@/tailwind.css"
+import cssHref from "@/index.css"
 
 export const links: LinksFunction = () => [
   {
     rel: "stylesheet",
     href: "https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap",
   },
-  { rel: "stylesheet", href: tailwindCss },
+  { rel: "stylesheet", href: cssHref },
 ]
 
 export default function App() {
