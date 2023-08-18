@@ -75,7 +75,6 @@ export default {
         return !listingIds.includes(previousListing.id)
       })
       .map((listing) => listing.id)
-    console.log(unavailableIds)
     if (unavailableIds.length > 0) {
       // set any listings that are no longer available to unavailable
       await db

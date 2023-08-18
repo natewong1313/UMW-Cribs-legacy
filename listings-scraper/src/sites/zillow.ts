@@ -186,10 +186,9 @@ export class ZillowScraper {
       )
     const propertyDetails = responseBody.data.property
     this.listings[listingId].description = propertyDetails?.description
-    this.listings[listingId].imageUrls = [
-      ...this.listings[listingId].imageUrls,
-      ...propertyDetails.photoUrlsHighRes.map((link: any) => link.url),
-    ]
+    this.listings[listingId].imageUrls = propertyDetails.photoUrlsHighRes.map(
+      (link: any) => link.url
+    )
   }
   parseAddress(address: string) {
     const addressLine1Pattern = /^(.*?)(?:\s+(?:APT|UNIT|#)\s*[\dA-Z-]+)?$/i
