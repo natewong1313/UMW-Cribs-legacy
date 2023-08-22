@@ -1,4 +1,3 @@
-import * as ScrollArea from "@radix-ui/react-scroll-area"
 import {
   ActionArgs,
   json,
@@ -51,7 +50,6 @@ export const links: LinksFunction = () => [
 
 export const loader = async ({ request, context }: LoaderArgs) => {
   const url = new URL(request.url)
-  const headers = new Headers()
   const sortBy = url.searchParams.get("sortBy") ?? "mostRecent"
   let orderByStatement = sql`${dbListing.lastUpdatedAt} desc`
   switch (sortBy) {
@@ -84,6 +82,8 @@ export const loader = async ({ request, context }: LoaderArgs) => {
     if (whereStatement) whereStatement = sql`${whereStatement} and `
     whereStatement = sql`${whereStatement}${dbListing.price} <= ${maxPrice}`
   }
+  if (whereStatement) whereStatement = sql`${whereStatement} and `
+  whereStatement = sql`${whereStatement}${dbListing.isAvailable} = true`
   const listings = await context.db
     .select()
     .from(dbListing)
@@ -100,40 +100,10 @@ export const loader = async ({ request, context }: LoaderArgs) => {
       .where(eq(userLikedListings.userId, session.user.userId))
     likedListingIds = likedListings.map((l) => l.listingId)
   }
-  return json(
-    { listings, likedListingIds, user: session?.user ?? null },
-    { headers }
-  )
+  return json({ listings, likedListingIds, user: session?.user ?? null })
 }
 
-export const action = async ({ request, context }: ActionArgs) => {
-  const headers = new Headers()
-  const body = await request.formData()
-  const listingId = body.get("id")
-  if (!listingId) return json(null, { headers })
-  const authRequest = context.auth.handleRequest(request)
-  const session = await authRequest.validate()
-  if (!session) return json(null, { headers })
-
-  if (body.get("type") === "like") {
-    const hasAlreadyLiked = await context.db
-      .select()
-      .from(userLikedListings)
-      .where(eq(userLikedListings.userId, session.user.userId))
-      .where(eq(userLikedListings.listingId, listingId.toString()))
-    if (hasAlreadyLiked.length === 0) {
-      await context.db.insert(userLikedListings).values({
-        userId: session.user.userId,
-        listingId: listingId.toString(),
-      })
-    }
-  } else if (body.get("type") === "unlike") {
-    await context.db.execute(
-      sql`delete from ${userLikedListings} where ${userLikedListings.userId} = ${session.user.userId} and ${userLikedListings.listingId} = ${listingId}`
-    )
-  }
-  return json(null, { headers })
-}
+export const action = async ({ request, context }: ActionArgs) => {}
 
 export default function ListingsPage() {
   const { listings, likedListingIds, user } = useLoaderData<typeof loader>()
