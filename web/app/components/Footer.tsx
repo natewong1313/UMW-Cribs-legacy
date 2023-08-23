@@ -6,7 +6,7 @@ import { Button } from "./ui/Button"
 export default function Footer() {
   return (
     <Container sectionClassName="bg-white " className="py-16">
-      <div className="grid grid-cols-12 gap-8">
+      <div className="grid-cols-12 gap-8 space-y-8 lg:grid">
         <div className="col-span-3 mr-8 flex flex-col">
           <div className="flex items-center">
             <img

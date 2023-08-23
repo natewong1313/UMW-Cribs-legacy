@@ -26,7 +26,8 @@ import { eq, sql } from "drizzle-orm"
 import { useMemo, useState } from "react"
 import { ClientOnly } from "@/components/ClientOnly"
 import Container from "@/components/Container"
-import MapView from "@/components/MapView.client"
+import Footer from "@/components/Footer"
+import ListingsMap from "@/components/ListingsMap.client"
 import Navbar from "@/components/Navbar"
 import { Button } from "@/components/ui/Button"
 import ButtonGroup from "@/components/ui/ButtonGroup"
@@ -103,7 +104,33 @@ export const loader = async ({ request, context }: LoaderArgs) => {
   return json({ listings, likedListingIds, user: session?.user ?? null })
 }
 
-export const action = async ({ request, context }: ActionArgs) => {}
+export const action = async ({ request, context }: ActionArgs) => {
+  const body = await request.formData()
+  const listingId = body.get("id")
+  if (!listingId) return json(null)
+  const authRequest = context.auth.handleRequest(request)
+  const session = await authRequest.validate()
+  if (!session) return json(null)
+
+  if (body.get("type") === "like") {
+    const hasAlreadyLiked = await context.db
+      .select()
+      .from(userLikedListings)
+      .where(eq(userLikedListings.userId, session.user.userId))
+      .where(eq(userLikedListings.listingId, listingId.toString()))
+    if (hasAlreadyLiked.length === 0) {
+      await context.db.insert(userLikedListings).values({
+        userId: session.user.userId,
+        listingId: listingId.toString(),
+      })
+    }
+  } else if (body.get("type") === "unlike") {
+    await context.db.execute(
+      sql`delete from ${userLikedListings} where ${userLikedListings.userId} = ${session.user.userId} and ${userLikedListings.listingId} = ${listingId}`
+    )
+  }
+  return json(null)
+}
 
 export default function ListingsPage() {
   const { listings, likedListingIds, user } = useLoaderData<typeof loader>()
@@ -173,26 +200,6 @@ export default function ListingsPage() {
               Adjust filters{" "}
               {numberOfFiltersApplied > 0 && `(${numberOfFiltersApplied})`}
             </Button>
-            {/* <div className="sm:hidden">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setFiltersModalOpen(true)}
-              >
-                <span className="text-gray-400">
-                  <IconAdjustments size={18} />
-                </span>
-              </Button>
-            </div> */}
-            {/* <Select
-              placeholder="Select view"
-              value={view}
-              setValue={(value) => setView(value)}
-              className="sm:hidden"
-            >
-              <SelectOption title="Listings view" value="listingsView" />
-              <SelectOption title="Map view" value="mapView" />
-            </Select> */}
             <Select
               placeholder="Sort by"
               className="w-full sm:w-fit"
@@ -226,11 +233,12 @@ export default function ListingsPage() {
           <div className="col-span-3 hidden h-full sm:block">
             <ClientOnly fallback={<div style={{ height: "400px" }} />}>
               {/* @ts-ignore */}
-              {() => <MapView listings={listings} />}
+              {() => <ListingsMap listings={listings} />}
             </ClientOnly>
           </div>
         </div>
       </Container>
+      <Footer />
       <Modal
         isOpen={filtersModalOpen}
         setIsOpen={setFiltersModalOpen}

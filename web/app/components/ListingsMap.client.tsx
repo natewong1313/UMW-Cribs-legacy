@@ -8,7 +8,7 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet"
 type Props = {
   listings: Listing[]
 }
-export default function MapView({ listings }: Props) {
+export default function ListingsMap({ listings }: Props) {
   return (
     <div className="h-full w-full overflow-hidden rounded-lg">
       <MapContainer

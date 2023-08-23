@@ -16,6 +16,8 @@ const buttonVariants = cva(
           "bg-gray-100 text-gray-950 hover:bg-gray-200 active:bg-gray-300 focus-visible:ring-gray-200",
         outline:
           "bg-white text-gray-700 border-gray-200 hover:bg-gray-100 active:bg-gray-200 focus-visible:ring-gray-200",
+        "primary-outline":
+          "border-blue-300 bg-blue-50 text-blue-500 hover:bg-blue-100 active:bg-blue-100",
         invisible:
           "text-gray-700 hover:border-gray-300 active:bg-gray-100 focus-visible:ring-gray-200",
       },
