@@ -10,9 +10,9 @@ export default function Map({ markerCoords }: Props) {
   return (
     <div className="h-full w-full overflow-hidden rounded-lg">
       <MapContainer
-        center={markerCoords}
-        zoom={12}
-        className="m-0 h-96 w-[30rem] rounded-lg"
+        center={[38.309875, -77.466316]}
+        zoom={13}
+        className="h-full w-full rounded-lg"
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

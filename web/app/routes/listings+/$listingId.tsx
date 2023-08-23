@@ -101,7 +101,6 @@ export default function ListingId() {
     <div>
       <Navbar user={user} />
       <Container className="max-w-6xl">
-        {/* breadcrumbs */}
         <div className="flex items-center">
           <Link to="/listings" className="font-medium text-blue-500">
             Listings
@@ -247,20 +246,19 @@ export default function ListingId() {
             <ListingContactButtons listing={listing} />
           </div>
         </div>
-      </Container>
-      {/* <Container
-        sectionClassName="border-t border-b border-gray-200 bg-gray-50 mt-4"
-        className="py-4"
-      >
-        <div className="flex items-center justify-center">
-          <img
-            src={listing.mainImage ?? ""}
-            alt={listing.addressLineOne}
-            className="h-96 rounded-lg"
-          />
+        <div className="mt-4">
+          <h1 className="text-lg font-semibold">Where you'll be</h1>
+          <div className="mt-2 h-96 w-full rounded-md bg-gray-100">
+            <ClientOnly
+              fallback={<div className="h-96 w-full rounded-md bg-gray-200" />}
+            >
+              {() => (
+                <Map markerCoords={[listing.latitude, listing.longitude]} />
+              )}
+            </ClientOnly>
+          </div>
         </div>
-        <div className="col-span-2 flex flex-col justify-between"></div>
-      </Container> */}
+      </Container>
       <Footer />
     </div>
   )
