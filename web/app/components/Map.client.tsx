@@ -1,17 +1,17 @@
 // import "leaflet-defaulticon-compatibility"
 // import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css"
-import "leaflet/dist/leaflet.css"
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet"
 
 type Props = {
   markerCoords: [number, number]
+  address: string
 }
-export default function Map({ markerCoords }: Props) {
+export default function Map({ markerCoords, address }: Props) {
   return (
     <div className="h-full w-full overflow-hidden rounded-lg">
       <MapContainer
-        center={[38.309875, -77.466316]}
-        zoom={13}
+        center={markerCoords}
+        zoom={15}
         className="h-full w-full rounded-lg"
       >
         <TileLayer
@@ -21,7 +21,7 @@ export default function Map({ markerCoords }: Props) {
         <Marker position={markerCoords}>
           <Popup>
             <div className="flex flex-col">
-              <h1 className="mt-1 text-base font-semibold">UMW</h1>
+              <h1 className="text-base font-semibold">{address}</h1>
               <p>Fredericksburg, VA</p>
             </div>
           </Popup>

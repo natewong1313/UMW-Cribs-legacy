@@ -3,6 +3,7 @@ import {
   redirect,
   type LoaderArgs,
   V2_MetaFunction,
+  LinksFunction,
 } from "@remix-run/cloudflare"
 import { Form, Link, useLoaderData } from "@remix-run/react"
 import {
@@ -31,6 +32,13 @@ import { Button } from "@/components/ui/Button"
 export const meta: V2_MetaFunction<typeof loader> = ({ data }) => {
   return [{ title: data?.listing.addressLineOne + " | UMW Cribs" }]
 }
+
+export const links: LinksFunction = () => [
+  {
+    rel: "stylesheet",
+    href: "https://unpkg.com/leaflet@1.0.1/dist/leaflet.css",
+  },
+]
 
 export const loader = async ({ request, params, context }: LoaderArgs) => {
   if (!params.listingId) return redirect("/listings")
@@ -220,16 +228,6 @@ export default function ListingId() {
               {/* @ts-ignore */}
               <ListingContactButtons listing={listing} />
             </div>
-
-            {/* <div className="relative w-[30rem]">
-              <ClientOnly
-                fallback={<div className="h-96 w-[30rem] bg-gray-100" />}
-              >
-                {() => (
-                  <Map markerCoords={[listing.latitude, listing.longitude]} />
-                )}
-              </ClientOnly>
-            </div> */}
             <div className="mt-4">
               <h1 className="text-lg font-semibold">
                 About {listing.addressLineOne}
@@ -248,12 +246,17 @@ export default function ListingId() {
         </div>
         <div className="mt-4">
           <h1 className="text-lg font-semibold">Where you'll be</h1>
-          <div className="mt-2 h-96 w-full rounded-md bg-gray-100">
+          <div className="mt-2 block h-96 w-full">
             <ClientOnly
               fallback={<div className="h-96 w-full rounded-md bg-gray-200" />}
             >
               {() => (
-                <Map markerCoords={[listing.latitude, listing.longitude]} />
+                <Map
+                  markerCoords={[listing.latitude, listing.longitude]}
+                  address={
+                    listing.addressLineOne + " " + listing.addressLineTwo
+                  }
+                />
               )}
             </ClientOnly>
           </div>

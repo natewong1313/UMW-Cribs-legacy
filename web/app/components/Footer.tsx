@@ -29,9 +29,9 @@ export default function Footer() {
         <div className="col-span-2 flex flex-col">
           <h1 className="font-bold">Resources</h1>
           <ul className="mt-2 space-y-1.5">
+            <LinkComponent title="Home" href="/" />
             <LinkComponent title="Listings" href="/listings" />
             <LinkComponent title="Status" href="/listings" />
-            <LinkComponent title="Listings" href="/listings" />
           </ul>
         </div>
         <div className="col-span-2 flex flex-col">
