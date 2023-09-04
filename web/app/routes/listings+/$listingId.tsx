@@ -254,7 +254,7 @@ export default function ListingId() {
                 <Map
                   markerCoords={[listing.latitude, listing.longitude]}
                   address={
-                    listing.addressLineOne + " " + listing.addressLineTwo
+                    listing.addressLineOne + " " + (listing.addressLineTwo ?? "")
                   }
                 />
               )}

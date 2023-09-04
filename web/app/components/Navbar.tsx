@@ -29,9 +29,9 @@ export default function Navbar({ user }: Props) {
             <div className="flex items-center space-x-5 text-gray-500">
               <Link
                 to="/user/saved"
-                className="flex items-center font-medium hover:opacity-70"
+                className="flex items-center font-medium transition-all hover:opacity-70"
               >
-                <span className="mr-1.5 text-gray-700">
+                <span className="mr-1.5 text-gray-600">
                   <IconBookmark size={20} />
                 </span>
                 Saved Homes
@@ -48,7 +48,7 @@ export default function Navbar({ user }: Props) {
               <div className="h-5 w-px bg-zinc-900/20" />
               <Link
                 to="/settings"
-                className="flex items-center justify-center rounded-full bg-blue-100 p-2.5 hover:bg-blue-200/80"
+                className="flex items-center justify-center rounded-full bg-blue-100 p-2.5 transition-colors hover:bg-blue-200/80 "
               >
                 <span className="font-semibold text-blue-500">
                   <p>{user.firstName[0] + user.lastName[0]}</p>

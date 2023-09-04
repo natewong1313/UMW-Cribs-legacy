@@ -11,8 +11,7 @@ export const loader = async ({ request, context }: LoaderArgs) => {
 
 export default function AuthLayout() {
   return (
-    <div>
-      Auth
+    <div className="flex min-h-screen flex-col items-center bg-gray-100 px-4 py-20 sm:py-32">
       <Outlet />
     </div>
   )
